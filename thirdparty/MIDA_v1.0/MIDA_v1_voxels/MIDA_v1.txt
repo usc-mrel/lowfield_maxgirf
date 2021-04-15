@@ -1,0 +1,127 @@
+1	0	0.988235	1	Dura
+2	1	0.780392	0	Cerebellum Gray Matter
+3	0.658824	1	1	Pineal Body
+4	0	0	1	Amygdala
+5	1	0.423529	1	Hippocampus
+6	0.368627	0.588235	0.54902	CSF Ventricles
+7	0	0.384314	0.466667	Caudate Nucleus
+8	0.823529	0.54902	1	Putamen
+9	0.713726	0.121569	0.341176	Cerebellum White Matter
+10	0.521569	0.521569	0.533333	Brain Gray Matter
+11	0.807843	0	1	Brainstem Midbrain
+12	1	1	1	Brain White Matter
+13	0.917647	0.521569	0	Spinal Cord
+14	1	1	0	Brainstem Pons
+15	0.686275	1	0.423529	Brainstem Medulla
+16	0.890196	0.905882	0	Nucleus Accumbens
+17	0.894118	0.796078	1	Globus Pallidus
+18	0	1	0	Optic Tract
+19	1	0.686275	0	Hypophysis or Pituitary Gland
+20	1	1	0	Mammillary Body
+21	0.890196	0.356863	0.505882	Hypothalamus
+22	0.72549	0.807843	1	Commissura (Anterior)
+23	0.85098	0	0.247059	Commissura (Posterior)
+24	1	0	0	Blood Arteries
+25	0	0	1	Blood Veins
+26	0	0	0	Air Internal - Ethmoidal Sinus
+27	0	0	0	Air Internal - Frontal Sinus
+28	0	0	0	Air Internal - Maxillary Sinus
+29	0	0	0	Air Internal - Sphenoidal Sinus
+30	0	0	0.54902	Air Internal - Mastoid
+31	0	0	0	Air Internal - Nasal/Pharynx
+32	0.411765	0	0	CSF General
+33	0.905882	0.45098	1	Ear Cochlea
+34	1	0.223529	0.211765	Ear Semicircular Canals
+35	0	0.913725	0.843137	Ear Auricular Cartilage (Pinna)
+36	0	0.411765	0	Mandible
+37	0.588235	0	0.301961	Mucosa
+38	0.45098	0.776471	0.12549	Muscle (General)
+39	0.85098	0.713726	1	Nasal Septum (Cartilage)
+40	1	1	0.588235	Skull
+41	1	0	1	Teeth
+42	1	0.588235	0	Tongue
+43	0.690196	0.478431	1	Adipose Tissue
+44	0	0.988235	0.368627	Vertebra - C1 (atlas)
+45	0.384314	0.823529	1	Vertebra - C2 (axis)
+46	1	0	0.988235	Vertebra - C3
+47	0.203922	0.466667	0.368627	Vertebra - C4
+48	0	0.137255	0.862745	Vertebra - C5
+49	1	0.603922	0.780392	Intervertebral Discs
+50	0	0	0	Background
+51	1	0.72549	0.564706	Epidermis/Dermis
+52	0.745098	0	0	Skull Diploë
+53	0.309804	0	0.294118	Skull Inner Table
+54	0	0.662745	0.843137	Skull Outer Table
+55	0	0	1	Eye Lens
+56	1	1	1	Eye Retina/Choroid/Sclera
+57	0	0.576471	0.356863	Eye Vitreous
+58	0.576471	0	0.164706	Eye Cornea
+59	0.494118	0.741176	1	Eye Aqueous
+60	1	0.337255	0	Muscle - Platysma
+61	1	0	0.396078	Tendon - Galea Aponeurotica
+62	0.521569	0.239216	0.352941	Subcutaneous Adipose Tissue
+63	1	0.196078	0	Muscle - Temporalis/Temporoparietalis
+64	1	0.67451	0.494118	Muscle - Occipitiofrontalis - Frontal Belly
+65	0.815686	0.352941	0.423529	Muscle - Lateral Pterygoid
+66	1	0.717647	0	Muscle - Masseter
+67	1	0.45098	0.254902	Muscle - Splenius Capitis
+68	0.733333	0.098039	0.294118	Muscle - Sternocleidomastoid
+69	0.788235	0.635294	1	Muscle - Occipitiofrontalis - Occipital Belly
+70	0.282353	0.396078	0.407843	Muscle - Trapezius
+71	1	0.309804	0.309804	Muscle - Mentalis
+72	0.533333	0.603922	0.913725	Muscle - Depressor Anguli Oris
+73	1	0.67451	0	Muscle - Depressor Labii
+74	0	0.466667	0.913725	Muscle - Nasalis
+75	1	0.54902	0.647059	Muscle - Orbicularis Oris
+76	0.945098	0.12549	0.254902	Muscles - Procerus
+77	0	0.407843	0	Muscle - Levator Labii Superioris
+78	0	0.564706	0.717647	Muscle - Zygomaticus Major
+79	0.211765	0.776471	0.533333	Muscle - Orbicularis Oculi
+80	0.294118	0	0	Muscle - Levator Scapulae
+81	0.843137	0.619608	0.239216	Muscle - Medial Pterygoid
+82	1	0.239216	0.282353	Muscle - Zygomaticus Minor
+83	0.521569	0.494118	0.635294	Muscles - Risorius
+84	1	0.435294	0.098039	Muscle - Buccinator
+85	1	1	1	Ear Auditory Canal
+86	0.901961	0.309804	0.266667	Ear Pharyngotympanic Tube
+87	0.760784	0.533333	0	Hyoid Bone
+88	0.858824	0.929412	0.619608	Submandibular Gland
+89	0.505882	0.423529	0.521569	Parotid Gland
+90	1	0.54902	0.45098	Sublingual Gland
+91	0.619608	0.717647	1	Muscle - Superior Rectus
+92	1	0.67451	0.168627	Muscle - Medial Rectus
+93	0.266667	0.282353	0.576471	Muscle - Lateral Rectus
+94	0.945098	0	0.745098	Muscle - Inferior Rectus
+95	0	1	1	Muscle - Superior Oblique
+96	1	1	0	Muscle - Inferior Oblique
+97	0	0	0	Air Internal - Oral Cavity
+98	0	0.282353	0.043137	Tendon - Temporalis Tendon
+99	0	0.847059	0	Substantia Nigra
+100	0.360784	0	0.862745	Cerebral Peduncles
+101	1	0	0	Optic Chiasm
+102	0	0.984314	0	Cranial Nerve I - Olfactory
+103	0.25098	0.568627	0.639216	Cranial Nerve II - Optic
+104	0	0	1	Cranial Nerve III - Oculomotor
+105	0.65098	0.196078	0.458824	Cranial Nerve IV - Trochlear
+106	0.458824	0.290196	0.792157	Cranial Nerve V - Trigeminal
+107	0.929412	0	0.929412	Cranial Nerve V2 - Maxillary Division
+108	1	0.890196	0	Cranial Nerve V3 - Mandibular Division
+109	1	0	1	Cranial Nerve VI - Abducens
+110	0.513726	0.803922	0.556863	Cranial Nerve VII - Facial
+111	0.623529	1	1	Cranial Nerve VIII - Vestibulocochlear
+112	0	1	0	Cranial Nerve IX - Glossopharyngeal
+113	0.65098	0.376471	0.596078	Cranial Nerve X - Vagus
+114	0.082353	0.458824	0.207843	Cranial Nerve XI - Accessory
+115	1	1	0	Cranial Nerve XII - Hypoglossal
+116	0	0	1	Thalamus
+
+
+Grid extent (number of cells)
+nx	480
+ny	480
+nz	350
+
+Spatial steps [m]
+dx	0.0005
+dy	0.0005
+dz	0.0005
