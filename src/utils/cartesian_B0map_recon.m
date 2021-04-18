@@ -108,7 +108,7 @@ if main_orientation == 0 % sagittal plane
 elseif main_orientation == 1 % coronal plane
     reorient = @(x) x;
 elseif main_orientation == 2 % transverse plane
-    reorient = @(x) rot90(x, -1);
+    reorient = @(x) flip(rot90(x, -1), 2);
 end
 
 figure('Color', 'w');
@@ -272,7 +272,6 @@ caxis([-60 60]);
 title('Raw + Spherical harmonics fit [Hz]')
 export_fig(fullfile(output_directory, 'B0map_fill'), '-r400', '-tif');
 
-if 0
 %% Perform TGV-based denoising on a static off-resonance map
 %--------------------------------------------------------------------------
 % Primal-dual method for TGV denoising
@@ -282,7 +281,6 @@ for idx = 1:N3
     tic; fprintf('(%2d/%2d): Performing TGV smoothing (lambda = %g)... ', idx, N3, lambda);
     B0map_tgv(:,:,idx) = TGV_denoise(B0map_fill(:,:,idx), lambda, maxiter_tgv, 0);
     fprintf('done! (%6.4f/%6.4f sec)\n', toc, toc(start_time));
-end
 end
 
 %% Fill the holes in the mask
@@ -304,7 +302,7 @@ mask_fill = imdilate(mask_fill, se);
 mask_fill = imfill(mask_fill, 'holes');
 
 %% Apply a mask on a TGV smoothed off-resonance map
-%B0map_tgv_mask = B0map_tgv .* mask_fill;
+B0map_tgv_mask = B0map_tgv .* mask_fill;
 B0map_fit_mask = B0map_fit .* mask_fill;
 
 %% Display results
@@ -313,7 +311,6 @@ montage(reorient(mask_fill), 'DisplayRange', []);
 title('Mask without holes')
 export_fig(fullfile(output_directory, 'mask_fill'), '-r400', '-tif');
 
-if 0
 figure('Color', 'w');
 montage(reorient(B0map_tgv), 'DisplayRange', []);
 colormap(hot(256)); colorbar;
@@ -327,7 +324,6 @@ colormap(hot(256)); colorbar;
 caxis([-60 60]);
 title('TGV smoothing x mask [Hz]')
 export_fig(fullfile(output_directory, 'B0map_tgv_mask'), '-r400', '-tif');
-end
 
 figure('Color', 'w');
 montage(reorient(B0map_fit_mask), 'DisplayRange', []);
@@ -335,31 +331,5 @@ colormap(hot(256)); colorbar;
 caxis([-60 60]);
 title('Spherical harmonics fit x mask [Hz]')
 export_fig(fullfile(output_directory, 'B0map_fit_mask'), '-r400', '-tif');
-
-
-%     %% Display results
-%     figure('Color', 'w', 'Position', [1 1 1600 823]);
-%     im_montage = cat(2, flip(rot90(B0map_raw,-1),2)    , flip(rot90(B0map_raw .* voxel_mask,-1),2), ...
-%                         flip(rot90(B0map_fit,-1),2)    , flip(rot90(B0map_temp,-1),2), ...
-%                         flip(rot90(B0map_fit_TGV,-1),2), flip(rot90(B0map_fit_TGV .* mask,-1),2));
-% %     im_montage = cat(2, B0map_raw, B0map_raw .* voxel_mask, ...
-% %                         B0map_fit_TGV, B0map_fit_TGV .* voxel_mask);
-%     imagesc(im_montage); axis image off;
-%     caxis([-70 70]);
-%     %cmap = hot(256);
-%     cmap = jet(256);
-%     colormap(cmap);
-%     hc = colorbar;
-%     title(hc, '[Hz]', 'FontSize', 14);
-%     set(hc, 'FontSize', 14);
-%     text(N1/2            , 0, 'Raw B0 map'             , 'Color', 'k', 'FontSize', 14, 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center');
-%     text(N1/2 + 1*N1, 0, 'Raw  \times voxel mask' , 'Color', 'k', 'FontSize', 14, 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center');
-%     text(N1/2 + 2*N1, 0, 'Spherical harmonics fit', 'Color', 'k', 'FontSize', 14, 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center');
-%     text(N1/2 + 3*N1, 0, 'Raw + fit'              , 'Color', 'k', 'FontSize', 14, 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center');
-%     text(N1/2 + 4*N1, 0, 'TGV smoothing'          , 'Color', 'k', 'FontSize', 14, 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center');
-%     text(N1/2 + 5*N1, 0, 'TGV  \times  mask'      , 'Color', 'k', 'FontSize', 14, 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center');
-%     export_fig(fullfile(user_opts_B0map.output_directory, sprintf('B0map_slice%d', idx3)), '-r400', '-tif');
-%     drawnow;
-% end
 
 end

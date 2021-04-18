@@ -86,29 +86,47 @@ warning off;
 % support_constraint = 0;
 % channel_range = [];
 
-
+%%
 %--------------------------------------------------------------------------
 % 20201102_NV_brain, axial
 %--------------------------------------------------------------------------
+% data_directory = 'D:\lowfield\NHLBI\data\20201102_NV_brain';
+% spiral_filename = 'meas_MID00275_FID03658_se_spiral_1102_ax_s24';
+% gre_filenames{1} = 'meas_MID00276_FID03659_gre_TE1';
+% gre_filenames{2} = 'meas_MID00277_FID03660_gre_TE2';
+% gre_filenames{3} = 'meas_MID00278_FID03661_gre_TE3';
+% gre_filenames{4} = 'meas_MID00279_FID03662_gre_TE4';
+% gre_filenames{5} = 'meas_MID00280_FID03663_gre_TE5';
+% user_opts.vds_factor   = 75;
+% user_opts.discard_pre  = 20;
+% user_opts.discard_post = 20;
+% static_B0_correction = 1;
+% support_constraint = 0;
+% channel_range = [];
+
+%%
+%--------------------------------------------------------------------------
+% 20201102_NV_brain, sagittal
+%--------------------------------------------------------------------------
 data_directory = 'D:\lowfield\NHLBI\data\20201102_NV_brain';
-gre_filenames{1} = 'meas_MID00276_FID03659_gre_TE1';
-gre_filenames{2} = 'meas_MID00277_FID03660_gre_TE2';
-gre_filenames{3} = 'meas_MID00278_FID03661_gre_TE3';
-gre_filenames{4} = 'meas_MID00279_FID03662_gre_TE4';
-gre_filenames{5} = 'meas_MID00280_FID03663_gre_TE5';
-spiral_filename = 'meas_MID00275_FID03658_se_spiral_1102_ax_s24';
+spiral_filename = 'meas_MID00260_FID03643_se_spiral_1102_sag_s24';
+gre_filenames{1} = 'meas_MID00261_FID03644_gre_TE1';
+gre_filenames{2} = 'meas_MID00262_FID03645_gre_TE2';
+gre_filenames{3} = 'meas_MID00263_FID03646_gre_TE3';
+gre_filenames{4} = 'meas_MID00264_FID03647_gre_TE4';
+gre_filenames{5} = 'meas_MID00265_FID03648_gre_TE5';
 user_opts.vds_factor   = 75;
 user_opts.discard_pre  = 20;
 user_opts.discard_post = 20;
 static_B0_correction = 1;
-support_constraint = 0;
-channel_range = [];
+support_constraint = 1;
+channel_range = [(1:14).';16;17];
 
 %% Set reconstruction parameters
 %--------------------------------------------------------------------------
 % MaxGIRF reconstruction
 %--------------------------------------------------------------------------
-osf     = 1;    % grid oversampling factor
+osf     = 2;    % grid oversampling factor
 maxiter = 15;   % number of CG iterations
 beta    = 1e-6; % Tikhonov regularization parameter
 Lmax    = 15;   % maximum rank of the SVD approximation of a higher-order encoding matrix
@@ -172,11 +190,13 @@ end
 
 user_opts_cartesian.output_directory = output_directory;
 [im_echo,B0map,x_echo,y_echo,z_echo,TE_echo] = cartesian_B0map_recon(gre_noise_fullpaths, gre_data_fullpaths, gre_dat_fullpaths, user_opts_cartesian);
+B0map_true = B0map;
+
 
 %% Load cartesian images
 load(fullfile(data_directory, 'd20201102_NV_brain'));
-im_cartesian = flip(rot90(s24_se_15b130_tra.img,1),1);
-%im_cartesian = im_echo_walsh(:,:,1,1);
+%im_cartesian = flip(rot90(s24_se_15b130_tra.img,1),1);
+im_cartesian = s12_se_15b130_sag.img;
 
 %% Read spiral k-space data
 start_time = tic;
@@ -337,6 +357,25 @@ if isempty(channel_range)
 end
 Nc = length(channel_range); % number of coils
 
+%% Zeropad a static off-resonance map
+if osf > 1
+    Bmap_orig = B0map;
+    [N1_,N2_,N3_] = size(B0map);
+    B0map = zeros(N1, N2, N3_, 'double');
+    idx1_range = (-floor(N1_/2):ceil(N1_/2)-1).' + floor(N1/2) + 1;
+    idx2_range = (-floor(N2_/2):ceil(N2_/2)-1).' + floor(N2/2) + 1;
+    idx3_range = (1:Ns).';
+    B0map(idx1_range,idx2_range,idx3_range) = Bmap_orig;
+
+    im_echo_orig = im_echo;
+    im_echo = zeros(N1, N2, N3_, 'double');
+    idx1_range = (-floor(N1_/2):ceil(N1_/2)-1).' + floor(N1/2) + 1;
+    idx2_range = (-floor(N2_/2):ceil(N2_/2)-1).' + floor(N2/2) + 1;
+    idx3_range = (1:Ns).';
+    im_echo(idx1_range,idx2_range,idx3_range) = im_echo_orig(:,:,:,1);
+    
+end
+
 %% Reconstruct images per slice
 nr_recons = nr_slices * nr_contrasts * nr_phases * nr_repetitions * nr_sets * nr_segments;
 % 9 for sagittal
@@ -361,12 +400,12 @@ for idx = 9%:nr_recons
     kspace = complex(zeros(Nk, Ni, Nc, 'single'));
     for idx1 = 1:length(profile_list)
         interleaf_nr = raw_data.head.idx.kspace_encode_step_1(profile_list(idx1)) + 1;
-        kspace(:,interleaf_nr,:) = kspace(:,interleaf_nr,:) + reshape(raw_data.data{profile_list(idx1)}(index_range,:), [Nk 1 Nc]);
+        kspace(:,interleaf_nr,:) = kspace(:,interleaf_nr,:) + reshape(raw_data.data{profile_list(idx1)}(index_range,channel_range), [Nk 1 Nc]);
     end
 
     %% Prewhiten k-space data
     tic; fprintf('Prewhitening k-space data... ');
-    kspace = ipermute(reshape(inv_L * reshape(permute(kspace, [3 1 2]), [Nc Nk*Ni]), [Nc Nk Ni]), [3 1 2]);
+    kspace = ipermute(reshape(inv_L(channel_range,channel_range) * reshape(permute(kspace, [3 1 2]), [Nc Nk*Ni]), [Nc Nk Ni]), [3 1 2]);
     fprintf('done! (%6.4f/%6.4f sec)\n', toc, toc(start_time));
 
     %% Calculate the actual slice number for Siemens interleaved multislice imaging
@@ -618,12 +657,6 @@ for idx = 9%:nr_recons
         otherwise
     end
 
-    %----------------------------------------------------------------------
-    % Combine a circular mask with a support of B0 maps
-    %----------------------------------------------------------------------
-    %B0mask = (abs(B0map) > 0);
-    %mask = mask | B0mask;
-
     %% Perform NUFFT reconstruction
     %----------------------------------------------------------------------
     % Prepare an NUFFT structure using k-space trajectories in RCS
@@ -681,7 +714,7 @@ for idx = 9%:nr_recons
 
     %% Perform optimal coil combination for NUFFT reconstruction
     im_nufft = sum(imc_nufft .* conj(csm), 3);
-    figure, imagesc(rot90(abs(im_nufft),-1)); axis image; colormap(gray(256));
+    figure, imagesc(abs(im_nufft)); axis image; colormap(gray(256));
 
     %% Perform CG-SENSE reconstruction
     start_time_sense = tic;
@@ -833,7 +866,7 @@ for idx = 9%:nr_recons
         end
         fprintf('done! (%6.4f/%6.4f sec)\n', toc, toc(start_time));
     end
-    im_cpr = reshape(b, [N1 N2 Lmax]);
+    im_maxgirf_cpr = reshape(b, [N1 N2 Lmax]);
 
     %% Perform lowrank MaxGIRF reconstruction
     start_time_lowrank = tic;
@@ -842,7 +875,7 @@ for idx = 9%:nr_recons
     limit = 1e-5;
     E = @(x,tr) encoding_lowrank_MaxGIRF(x, csm, u_tilde(:,1:L,:), v_tilde(:,1:L,:), w, st, tr);
     [m_lowrank, flag, relres, iter, resvec, lsvec] = lsqr(E, b(:,L), limit, max_iterations, [], [], []); % NL x 1
-    im_lowrank = reshape(m_lowrank, [N1 N2]);
+    im_maxgirf_lowrank = reshape(m_lowrank, [N1 N2]);
     fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
     computation_time_lowrank = toc(start_time_lowrank);
 
@@ -885,7 +918,7 @@ for idx = 9%:nr_recons
     elseif main_orientation == 1 % coronal plane
         reorient = @(x) x;
     elseif main_orientation == 2 % transverse plane
-        reorient = @(x) rot90(x, -1);
+        reorient = @(x) flip(rot90(x, -1), 2);
         slice_offset = PCS_offset(3); % [m]
         axis_text = 'z';
     end
@@ -931,6 +964,24 @@ end
 
 
 return
+%% Trajectory
+%%
+FontSize = 25;
+figure('Color', 'k', 'Position', [6 421 1029 387]);
+hold on; axis off;
+plot(t*1e3, gx_predicted(:,1)*1e3, 'LineWidth', 2);
+%plot(t([1,end])*1e3, zeros(2,1), 'Color', 'w', 'LineWidth', 2);
+%text(t(end)*1e3, 0, 'Time');
+%xlabel('Time [msec]');
+%ylabel('Amplitude [mT/m]', 'Color', 'w', 'FontSize', 16);
+%title('Prescribed Gradients', 'Color', 'w', 'FontSize', 16);
+set(gca, 'FontSize', 16, 'Color', 'k', 'XColor', 'w', 'YColor', 'w');
+export_fig(fullfile(output_directory, sprintf('prescribed_gradients')), '-r400', '-tif');
+
+
+
+
+
 
 %%
 figure('Color', 'k', 'Position', [1 1 1600 823]);

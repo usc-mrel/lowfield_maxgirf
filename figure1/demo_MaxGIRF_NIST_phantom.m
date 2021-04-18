@@ -25,24 +25,6 @@
 %
 %--------------------------------------------------------------------------
 
-
-% BLAS call in linux
-%https://www.mathworks.com/help/matlab/matlab_external/calling-lapack-and-blas-functions-from-mex-files.html#br26788-1
-
-% Modify Function Name on UNIX Systems
-% 
-% Add an underscore character following the function name when calling LAPACK or BLAS functions on a UNIX® system. For example, to call dgemm, use:
-% 
-% dgemm_(arg1, arg2, ..., argn);
-% 
-% Or add these lines to your source code:
-% 
-% #if !defined(_WIN32)
-% #define dgemm dgemm_
-% #endif
-    
-    
-
 %% Clean slate
 close all; clear; clc;
 
@@ -85,43 +67,43 @@ warning off;
 % static_B0_correction = 1;
 % support_constraint = 0;
 % channel_range = [];
-% 
-% %--------------------------------------------------------------------------
-% % axial at x = 0 [mm] and Gmax = 24 [mT/m]
-% %--------------------------------------------------------------------------
-% data_directory = 'D:\lowfield\NHLBI\data\20200506_NIST_phantom_shift';
-% gre_filenames{1} = 'meas_MID00198_FID69543_ax_75mm_ref_gre_TE1';
-% gre_filenames{2} = 'meas_MID00199_FID69544_ax_75mm_ref_gre_TE2';
-% gre_filenames{3} = 'meas_MID00200_FID69545_ax_75mm_ref_gre_TE3';
-% gre_filenames{4} = 'meas_MID00201_FID69546_ax_75mm_ref_gre_TE4';
-% gre_filenames{5} = 'meas_MID00202_FID69547_ax_75mm_ref_gre_TE5';
-% gre_filenames{6} = 'meas_MID00203_FID69548_ax_75mm_ref_gre_TE6';
-% spiral_filename = 'meas_MID00204_FID69549_ax_75mm_spiral_gmax24';
-% user_opts.vds_factor   = 100;
-% user_opts.discard_pre  = 0;
-% user_opts.discard_post = 0;
-% static_B0_correction = 1;
-% support_constraint = 0;
-% channel_range = [];
-
 
 %--------------------------------------------------------------------------
-% 20201102_NV_brain, axial
+% axial at x = 75 [mm] and Gmax = 24 [mT/m]
 %--------------------------------------------------------------------------
-data_directory = 'D:\lowfield\NHLBI\data\20201102_NV_brain';
-gre_filenames{1} = 'meas_MID00276_FID03659_gre_TE1';
-gre_filenames{2} = 'meas_MID00277_FID03660_gre_TE2';
-gre_filenames{3} = 'meas_MID00278_FID03661_gre_TE3';
-gre_filenames{4} = 'meas_MID00279_FID03662_gre_TE4';
-gre_filenames{5} = 'meas_MID00280_FID03663_gre_TE5';
-spiral_filename = 'meas_MID00275_FID03658_se_spiral_1102_ax_s24';
-user_opts.vds_factor   = 75;
-user_opts.discard_pre  = 20;
-user_opts.discard_post = 20;
+data_directory = 'D:\lowfield\NHLBI\data\20200506_NIST_phantom_shift';
+gre_filenames{1} = 'meas_MID00198_FID69543_ax_75mm_ref_gre_TE1';
+gre_filenames{2} = 'meas_MID00199_FID69544_ax_75mm_ref_gre_TE2';
+gre_filenames{3} = 'meas_MID00200_FID69545_ax_75mm_ref_gre_TE3';
+gre_filenames{4} = 'meas_MID00201_FID69546_ax_75mm_ref_gre_TE4';
+gre_filenames{5} = 'meas_MID00202_FID69547_ax_75mm_ref_gre_TE5';
+gre_filenames{6} = 'meas_MID00203_FID69548_ax_75mm_ref_gre_TE6';
+spiral_filename = 'meas_MID00204_FID69549_ax_75mm_spiral_gmax24';
+user_opts.vds_factor   = 100;
+user_opts.discard_pre  = 0;
+user_opts.discard_post = 0;
 static_B0_correction = 1;
 support_constraint = 0;
 channel_range = [];
 
+
+% %--------------------------------------------------------------------------
+% % 20201102_NV_brain, axial
+% %--------------------------------------------------------------------------
+% data_directory = 'D:\lowfield\NHLBI\data\20201102_NV_brain';
+% gre_filenames{1} = 'meas_MID00276_FID03659_gre_TE1';
+% gre_filenames{2} = 'meas_MID00277_FID03660_gre_TE2';
+% gre_filenames{3} = 'meas_MID00278_FID03661_gre_TE3';
+% gre_filenames{4} = 'meas_MID00279_FID03662_gre_TE4';
+% gre_filenames{5} = 'meas_MID00280_FID03663_gre_TE5';
+% spiral_filename = 'meas_MID00275_FID03658_se_spiral_1102_ax_s24';
+% user_opts.vds_factor   = 75;
+% user_opts.discard_pre  = 20;
+% user_opts.discard_post = 20;
+% static_B0_correction = 1;
+% support_constraint = 0;
+% channel_range = [];
+% 
 %% Set reconstruction parameters
 %--------------------------------------------------------------------------
 % MaxGIRF reconstruction
@@ -139,7 +121,7 @@ L       = 15;   % rank of the SVD approximation of a higher-order encoding matri
 %--------------------------------------------------------------------------
 % TGV denoising
 %--------------------------------------------------------------------------
-user_opts_cartesian.zpad_factor = 2;
+user_opts_cartesian.zpad_factor = 1;
 user_opts_cartesian.maxiter_tgv = 1500; % number of primal-dual iterations
 user_opts_cartesian.lambda      = 1e2;  % regularization parameter
 
@@ -356,10 +338,10 @@ nr_recons = nr_slices * nr_contrasts * nr_phases * nr_repetitions * nr_sets * nr
 %slice : 1,3,5,7,9,11,2,4,6,8,10
 %10 for axial
 
-for idx2 = 10%:nr_recons
+for idx = 10%:nr_recons
     %% Get information about the current slice
-    [slice_nr, contrast_nr, phase_nr, repetition_nr, set_nr, segment_nr] = ind2sub([nr_slices nr_contrasts nr_phases nr_repetitions nr_sets nr_segments], idx2);
-    fprintf('(%2d/%2d): Reconstructing slice (slice = %2d, contrast = %2d, phase = %2d, repetition = %2d, set = %2d, segment = %2d)\n', idx2, nr_recons, slice_nr, contrast_nr, phase_nr, repetition_nr, set_nr, segment_nr);
+    [slice_nr, contrast_nr, phase_nr, repetition_nr, set_nr, segment_nr] = ind2sub([nr_slices nr_contrasts nr_phases nr_repetitions nr_sets nr_segments], idx);
+    fprintf('(%2d/%2d): Reconstructing slice (slice = %2d, contrast = %2d, phase = %2d, repetition = %2d, set = %2d, segment = %2d)\n', idx, nr_recons, slice_nr, contrast_nr, phase_nr, repetition_nr, set_nr, segment_nr);
 
     %% Get a list of profiles in the current slice (all averages)
     profile_list = find((raw_data.head.idx.slice      == (slice_nr - 1))      & ...
@@ -633,8 +615,8 @@ for idx2 = 10%:nr_recons
     %----------------------------------------------------------------------
     % Combine a circular mask with a support of B0 maps
     %----------------------------------------------------------------------
-    %B0mask = (abs(B0map) > 0);
-    %mask = mask | B0mask;
+    B0mask = (abs(B0map) > 0);
+    mask = mask | B0mask;
 
     %% Perform NUFFT reconstruction
     %----------------------------------------------------------------------
@@ -656,7 +638,7 @@ for idx2 = 10%:nr_recons
     start_time_nufft = tic;
     imc_nufft = complex(zeros(N1, N2, Nc, 'double'));
     for c = 1:Nc
-        tic; fprintf('(%2d/%2d): NUFFT reconstruction (c=%2d/%2d)... ', idx2, nr_recons, c, Nc);
+        tic; fprintf('(%2d/%2d): NUFFT reconstruction (c=%2d/%2d)... ', idx, nr_recons, c, Nc);
         %------------------------------------------------------------------
         % Apply the adjoint of 2D NUFFT
         %------------------------------------------------------------------
@@ -666,7 +648,7 @@ for idx2 = 10%:nr_recons
     computation_time_nufft = toc(start_time_nufft);
 
     %% Calculate coil sensitivity maps
-    tic; fprintf('(%2d/%2d): Calculating coil sensitivity maps with Walsh method... ', idx2, nr_recons);
+    tic; fprintf('(%2d/%2d): Calculating coil sensitivity maps with Walsh method... ', idx, nr_recons);
     %----------------------------------------------------------------------
     % IFFT to k-space (k-space <=> image-space)
     %----------------------------------------------------------------------
@@ -697,7 +679,7 @@ for idx2 = 10%:nr_recons
 
     %% Perform CG-SENSE reconstruction
     start_time_sense = tic;
-    tic; fprintf('(%2d/%2d): Performing CG-SENSE reconstruction...\n', idx2, nr_recons);
+    tic; fprintf('(%2d/%2d): Performing CG-SENSE reconstruction...\n', idx, nr_recons);
     b = reshape(sum(conj(csm).* imc_nufft, 3), [N 1]);
     max_iterations = 30;
     limit = 1e-5;
@@ -709,7 +691,7 @@ for idx2 = 10%:nr_recons
 
     %% Estimate coil sensitivity maps using ESPIRiT
     if support_constraint
-        tic; fprintf('(%2d/%2d): Calculating coil sensitivity maps with ESPIRiT... ', idx2, nr_recons);
+        tic; fprintf('(%2d/%2d): Calculating coil sensitivity maps with ESPIRiT... ', idx, nr_recons);
         %------------------------------------------------------------------
         % Set parameters
         %------------------------------------------------------------------
@@ -760,7 +742,7 @@ for idx2 = 10%:nr_recons
 
     %% Perform King's method for concomitant field correction
     start_time_king = tic;
-    tic; fprintf('(%2d/%2d): Performing King''s method...\n', idx2, nr_recons);
+    tic; fprintf('(%2d/%2d): Performing King''s method...\n', idx, nr_recons);
     [im_king,im_fs] = perform_deblurring_king_method(kspace, nufft_st, w, csm, gx_predicted, gy_predicted, gz_predicted, x, y, z, rotMatrixRCSToGCS, rotMatrixGCSToPCS, rotMatrixPCSToDCS, field_of_view_mm, DCS_offset, gamma, B0, dt);
     fprintf('done! (%6.4f/%6.4f sec)\n', toc, toc(start_time));
     computation_time_king = toc(start_time_king);
@@ -774,12 +756,12 @@ for idx2 = 10%:nr_recons
     v_tilde = complex(zeros(N , Lmax, Ni, 'double'));
     singular_values = complex(zeros(Lmax, Lmax, Ni, 'double'));
     for i = 1:Ni
-        tstart = tic; fprintf('(%2d/%2d): Calculating the randomized SVD (i=%2d/%2d)... \n', idx2, nr_recons, i, Ni);
+        tstart = tic; fprintf('(%2d/%2d): Calculating the randomized SVD (i=%2d/%2d)... \n', idx, nr_recons, i, Ni);
         [U,S,V] = calculate_rsvd_higher_order_encoding_matrix(k(:,4:end,i), p(:,4:end), Lmax, os, vec(B0map(:,:,actual_slice_nr)), t, static_B0_correction);
         u_tilde(:,:,i) = U(:,1:Lmax); % Nk x Lmax
         v_tilde(:,:,i) = V(:,1:Lmax) * S(1:Lmax,1:Lmax)'; % N x Lmax
         singular_values(:,:,i) = S(1:Lmax,1:Lmax);
-        fprintf('(%2d/%2d): Calculating the randomized SVD (i=%2d/%2d)... done! (%6.4f/%6.4f sec)\n', idx2, nr_recons, i, Ni, toc(tstart), toc(start_time));
+        fprintf('(%2d/%2d): Calculating the randomized SVD (i=%2d/%2d)... done! (%6.4f/%6.4f sec)\n', idx, nr_recons, i, Ni, toc(tstart), toc(start_time));
     end
 
     %% Calculate NUFFT structures for lowrank MaxGIRF reconstruction
@@ -805,10 +787,11 @@ for idx2 = 10%:nr_recons
     end
 
     %% Perform conjugate phase reconstruction using the MaxGIRF encoding model
+    start_time_cpr = tic;
     b = zeros(N, Lmax, 'double');
     for i = 1:Ni
         Nd = st{i}.Nd;
-        tic; fprintf('(%d/%d): Calculating conjugate phase reconstruction (i=%d/%d)... ', idx2, nr_recons, i, Ni);
+        tic; fprintf('(%d/%d): Calculating conjugate phase reconstruction (i=%d/%d)... ', idx, nr_recons, i, Ni);
 
         for c = 1:Nc
             %--------------------------------------------------------------
@@ -845,20 +828,20 @@ for idx2 = 10%:nr_recons
         end
         fprintf('done! (%6.4f/%6.4f sec)\n', toc, toc(start_time));
     end
-    im_cpr = reshape(b, [N1 N2 Lmax]);
+    im_maxgirf_cpr = reshape(b, [N1 N2 Lmax]);
+    computation_time_cpr = toc(start_time_cpr);
 
     %% Perform lowrank MaxGIRF reconstruction
     start_time_lowrank = tic;
-    tstart = tic; fprintf('(%d/%d): Performing lowrank MaxGIRF reconstruction...\n', idx2, nr_recons);
+    tstart = tic; fprintf('(%d/%d): Performing lowrank MaxGIRF reconstruction...\n', idx, nr_recons);
     max_iterations = 15;
     limit = 1e-5;
     E = @(x,tr) encoding_lowrank_MaxGIRF(x, csm, u_tilde(:,1:L,:), v_tilde(:,1:L,:), w, st, tr);
     [m_lowrank, flag, relres, iter, resvec, lsvec] = lsqr(E, b(:,L), limit, max_iterations, [], [], []); % NL x 1
-    im_lowrank = reshape(m_lowrank, [N1 N2]);
+    im_maxgirf_lowrank = reshape(m_lowrank, [N1 N2]);
     fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
     computation_time_lowrank = toc(start_time_lowrank);
 
-    return
     %% Case 1: MaxGIRF (predicted, without off-resonance, without conc. field correction) 
     E = complex(zeros(Nk, N, Ni, 'single'));
     for i = 1:Ni
@@ -918,9 +901,145 @@ for idx2 = 10%:nr_recons
     im_maxgirf3 = reshape(im3(:,maxiter), [N1 N2]);
     fprintf('done! (%6.4f/%6.4f sec)\n', toc, toc(start_time));
     computation_time_maxgirf3 = toc(start_time_maxgirf3);
+
+    %% Save each reconstruction in a mat file
+    %----------------------------------------------------------------------
+    % Save NUFFT reconstruction
+    %----------------------------------------------------------------------
+    output_fullpath = fullfile(output_directory, sprintf('nufft_slice%d', idx));
+    tic; fprintf('Saving results: %s... ', output_fullpath);
+    save(output_fullpath, 'im_nufft', 'computation_time_nufft');
+    fprintf('done! (%6.4f sec)\n', toc);
+
+    %----------------------------------------------------------------------
+    % Save CG-SENSE reconstruction
+    %----------------------------------------------------------------------
+    output_fullpath = fullfile(output_directory, sprintf('nufft_slice%d', idx));
+    tic; fprintf('Saving results: %s... ', output_fullpath);
+    save(output_fullpath, 'im_sense', 'computation_time_sense');
+    fprintf('done! (%6.4f sec)\n', toc);
+
+    %----------------------------------------------------------------------
+    % Save NUFFT reconstruction with King's method
+    %----------------------------------------------------------------------
+    output_fullpath = fullfile(output_directory, sprintf('king_slice%d', idx));
+    tic; fprintf('Saving results: %s... ', output_fullpath);
+    save(output_fullpath, 'im_king', 'computation_time_king');
+    fprintf('done! (%6.4f sec)\n', toc);
+
+    %----------------------------------------------------------------------
+    % Save conjugate phase reconstruction (MaxGIRF + Lowrank + CPR)
+    %----------------------------------------------------------------------
+    output_fullpath = fullfile(output_directory, sprintf('maxgirf_cpr_slice%d', idx));
+    tic; fprintf('Saving results: %s... ', output_fullpath);
+    save(output_fullpath, 'im_maxgirf_cpr', 'singular_values');
+    fprintf('done! (%6.4f sec)\n', toc);
+
+    %----------------------------------------------------------------------
+    % Save iterative MaxGIRF reconstruction with a lowrank approximation
+    %----------------------------------------------------------------------
+    output_fullpath = fullfile(output_directory, sprintf('maxgirf_lowrank_slice%d', idx));
+    tic; fprintf('Saving results: %s... ', output_fullpath);
+    save(output_fullpath, 'im_maxgirf_lowrank', 'computation_time_lowrank');
+    fprintf('done! (%6.4f sec)\n', toc);
+
+    %----------------------------------------------------------------------
+    % Save MaxGIRF reconstruction (case 1)
+    %----------------------------------------------------------------------
+    output_fullpath = fullfile(output_directory, sprintf('maxgirf1_slice%d', idx));
+    tic; fprintf('Saving results: %s... ', output_fullpath);
+    save(output_fullpath, 'im_maxgirf1', 'computation_time_maxgirf1');
+    fprintf('done! (%6.4f sec)\n', toc);
+
+    %----------------------------------------------------------------------
+    % Save MaxGIRF reconstruction (case 2)
+    %----------------------------------------------------------------------
+    output_fullpath = fullfile(output_directory, sprintf('maxgirf2_slice%d', idx));
+    tic; fprintf('Saving results: %s... ', output_fullpath);
+    save(output_fullpath, 'im_maxgirf2', 'computation_time_maxgirf2');
+    fprintf('done! (%6.4f sec)\n', toc);
+
+    %----------------------------------------------------------------------
+    % Save MaxGIRF reconstruction (case 3)
+    %----------------------------------------------------------------------
+    output_fullpath = fullfile(output_directory, sprintf('maxgirf3_slice%d', idx));
+    tic; fprintf('Saving results: %s... ', output_fullpath);
+    save(output_fullpath, 'im_maxgirf3', 'computation_time_maxgirf3');
+    fprintf('done! (%6.4f sec)\n', toc);
+
+    %% Display images
+    if main_orientation == 0 % sagittal plane
+        reorient = @(x) x;
+    elseif main_orientation == 1 % coronal plane
+        reorient = @(x) x;
+    elseif main_orientation == 2 % transverse plane
+        reorient = @(x) flip(rot90(x, -1), 2);
+        slice_offset = PCS_offset(3); % [m]
+        axis_text = 'z';
+    end
+
+    figure('Color', 'w');
+    imagesc(reorient(abs(im_echo(:,:,actual_slice_nr)))); axis image off;
+    colormap(gray(256));
+    title(sprintf('Cartesian, slice = %d, %s = %4.1f mm', idx, axis_text, slice_offset*1e3));
+    export_fig(fullfile(output_directory, sprintf('im_cartesian_slice%d', idx)), '-r400', '-tif', '-c[50,400,200,470]'); % [top,right,bottom,left]
+
+    figure('Color', 'w');
+    imagesc(reorient(abs(im_nufft))); axis image off;
+    colormap(gray(256));
+    title(sprintf('NUFFT, slice = %d, %s = %4.1f mm', idx, axis_text, slice_offset*1e3));
+    export_fig(fullfile(output_directory, sprintf('im_nufft_slice%d', idx)), '-r400', '-tif', '-c[50,400,200,470]'); % [top,right,bottom,left]
+
+    figure('Color', 'w');
+    imagesc(reorient(abs(im_king))); axis image off;
+    colormap(gray(256));
+    title(sprintf('King, slice = %d, %s = %4.1f mm', idx, axis_text, slice_offset*1e3));
+    export_fig(fullfile(output_directory, sprintf('im_king_slice%d', idx)), '-r400', '-tif', '-c[50,400,200,470]');
+
+    figure('Color', 'w');
+    imagesc(reorient(abs(im_maxgirf_cpr(:,:,end)))); axis image off;
+    colormap(gray(256));
+    title(sprintf('MaxGIRF + lowrank (CPR), slice = %d, %s = %4.1f mm', idx, axis_text, slice_offset*1e3));
+    export_fig(fullfile(output_directory, sprintf('im_maxgirf_cpr_slice%d', idx)), '-r400', '-tif', '-c[50,400,200,470]');
+
+    figure('Color', 'w');
+    imagesc(reorient(abs(im_maxgirf_lowrank))); axis image off;
+    colormap(gray(256));
+    title(sprintf('MaxGIRF + lowrank (CG), slice = %d, %s = %4.1f mm', idx, axis_text, slice_offset*1e3));
+    export_fig(fullfile(output_directory, sprintf('im_maxgirf_lowrank_slice%d', idx)), '-r400', '-tif', '-c[50,400,200,470]');
+
+    figure('Color', 'w');
+    imagesc(reorient(abs(im_maxgirf1))); axis image off;
+    colormap(gray(256));
+    title(sprintf('MaxGIRF w/o conc. and off, slice = %d, %s = %4.1f mm', idx, axis_text, slice_offset*1e3));
+    export_fig(fullfile(output_directory, sprintf('im_maxgirf1%d', idx)), '-r400', '-tif', '-c[50,400,200,470]');
+
+    figure('Color', 'w');
+    imagesc(reorient(abs(im_maxgirf2))); axis image off;
+    colormap(gray(256));
+    title(sprintf('MaxGIRF w/o off-resonance, slice = %d, %s = %4.1f mm', idx, axis_text, slice_offset*1e3));
+    export_fig(fullfile(output_directory, sprintf('im_maxgirf2%d', idx)), '-r400', '-tif', '-c[50,400,200,470]');
+
+    figure('Color', 'w');
+    imagesc(reorient(abs(im_maxgirf3))); axis image off;
+    colormap(gray(256));
+    title(sprintf('MaxGIRF, slice = %d, %s = %4.1f mm', idx, axis_text, slice_offset*1e3));
+    export_fig(fullfile(output_directory, sprintf('im_maxgirf3%d', idx)), '-r400', '-tif', '-c[50,400,200,470]');
+
+    figure('Color', 'w');
+    imagesc(reorient(B0map(:,:,actual_slice_nr))); axis image off;
+    colormap(hot(256));
+    title(sprintf('Off-resonance map (Hz), slice = %d, %s = %4.1f mm', idx, axis_text, slice_offset*1e3));
+    export_fig(fullfile(output_directory, sprintf('B0map_slice%d', idx)), '-r400', '-tif', '-c[50,400,200,470]');
+    colorbar; caxis([-60 60]);
+    export_fig(fullfile(output_directory, sprintf('B0map_slice%d_with_colorbar', idx)), '-r400', '-tif');
 end
 
 
+return
+
+
+if 0
 %% Calculate a time-varying concomitant field map
 KP = complex(zeros(Nk, N, Ni, 'single'));
 for i = 1:Ni
@@ -928,6 +1047,7 @@ for i = 1:Ni
     % (Nk x 3) x (N x 3).' => Nk x N
     KP(:,:,i) = k(:,4:end,i) * p(:,4:end).';
     fprintf('done! (%6.4f/%6.4f sec)\n', toc, toc(start_time));
+end
 end
 
 if 0
@@ -1019,17 +1139,18 @@ end
     im1 = flip(rot90(abs(im_nufft) / max(abs(im_nufft(:))),-1),2);
     im2 = flip(rot90(abs(im_sense) / max(abs(im_sense(:))),-1),2);
     im3 = flip(rot90(abs(im_king) / max(abs(im_king(:))),-1),2);
-    im4 = flip(rot90(abs(im_lowrank) / max(abs(im_lowrank(:))),-1),2);
+    im4 = flip(rot90(abs(im_maxgirf_lowrank) / max(abs(im_maxgirf_lowrank(:))),-1),2);
     im5 = flip(rot90(abs(im_maxgirf1) / max(abs(im_maxgirf1(:))),-1),2);
     im6 = flip(rot90(abs(im_maxgirf2) / max(abs(im_maxgirf2(:))),-1),2);
     im7 = flip(rot90(abs(im_maxgirf3) / max(abs(im_maxgirf3(:))),-1),2);
-    im8 = flip(rot90(abs(im_gre(:,:,1,1)) / max(abs(vec(im_gre(:,:,1,1)))),-1),2);   
+    im8 = flip(rot90(abs(im_echo(:,:,1,1)) / max(abs(vec(im_echo(:,:,1,1)))),-1),2);   
     im_montage1 = cat(2, im1  , im2, im3, im4, im5*0);
     im_montage2 = cat(2, im1*0, im5, im6, im7, im8);
     im_montage = cat(1, im_montage1, im_montage2);
-    figure('Color', 'w');
-    imagesc(abs(im_montage)); axis image; colormap(gray(256));
+    figure('Color', 'w', 'Position', [1 1 1600 823]);
+    imagesc(abs(im_montage)); axis image off; colormap(gray(256));
     caxis([0 0.7]);
+    export_fig(fullfile(output_directory, 'all_reconstruction'), '-r400', '-tif');
 
 
     
