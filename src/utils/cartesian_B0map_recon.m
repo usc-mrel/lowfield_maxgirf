@@ -111,27 +111,27 @@ elseif main_orientation == 2 % transverse plane
     reorient = @(x) flip(rot90(x, -1), 2);
 end
 
-figure('Color', 'w');
-montage(reorient(im_max), 'DisplayRange', []);
-export_fig(fullfile(output_directory, 'im_max'), '-r400', '-tif');
-
-figure('Color', 'w');
-montage(reorient(mask));
-export_fig(fullfile(output_directory, 'mask'), '-r400', '-tif');
-
-figure('Color', 'w');
-montage(reorient(B0map_raw), 'DisplayRange', []);
-colormap(hot(256)); colorbar;
-caxis([-60 60]);
-title('Raw static off-resonance map [Hz]')
-export_fig(fullfile(output_directory, 'B0map'), '-r400', '-tif');
-
-figure('Color', 'w');
-montage(reorient(B0map_raw .* mask), 'DisplayRange', []);
-colormap(hot(256)); colorbar;
-caxis([-60 60]);
-title('Masked raw static off-resonance map [Hz]')
-export_fig(fullfile(output_directory, 'B0map_mask'), '-r400', '-tif');
+% figure('Color', 'w');
+% montage(reorient(im_max), 'DisplayRange', []);
+% export_fig(fullfile(output_directory, 'im_max'), '-r400', '-tif');
+% 
+% figure('Color', 'w');
+% montage(reorient(mask));
+% export_fig(fullfile(output_directory, 'mask'), '-r400', '-tif');
+% 
+% figure('Color', 'w');
+% montage(reorient(B0map_raw), 'DisplayRange', []);
+% colormap(hot(256)); colorbar;
+% caxis([-60 60]);
+% title('Raw static off-resonance map [Hz]')
+% export_fig(fullfile(output_directory, 'B0map'), '-r400', '-tif');
+% 
+% figure('Color', 'w');
+% montage(reorient(B0map_raw .* mask), 'DisplayRange', []);
+% colormap(hot(256)); colorbar;
+% caxis([-60 60]);
+% title('Masked raw static off-resonance map [Hz]')
+% export_fig(fullfile(output_directory, 'B0map_mask'), '-r400', '-tif');
 
 %% Calculate a smooth spherical harmonics approximation to the off-resonance map
 B0map_fit = zeros(N1, N2, N3, 'double');
@@ -247,30 +247,30 @@ for idx3 = 1:N3
 end
 
 %% Display results
-figure('Color', 'w');
-montage(reorient(B0map_fit), 'DisplayRange', []);
-colormap(hot(256)); colorbar;
-caxis([-60 60]);
-title('Spherical harmonics fit [Hz]')
-export_fig(fullfile(output_directory, 'B0map_fit'), '-r400', '-tif');
-
-figure('Color', 'w');
-montage(reorient(B0map_fit .* mask), 'DisplayRange', []);
-colormap(hot(256)); colorbar;
-caxis([-60 60]);
-title('Masked spherical harmonics fit [Hz]')
-export_fig(fullfile(output_directory, 'B0map_fit_mask'), '-r400', '-tif');
+% figure('Color', 'w');
+% montage(reorient(B0map_fit), 'DisplayRange', []);
+% colormap(hot(256)); colorbar;
+% caxis([-60 60]);
+% title('Spherical harmonics fit [Hz]')
+% export_fig(fullfile(output_directory, 'B0map_fit'), '-r400', '-tif');
+% 
+% figure('Color', 'w');
+% montage(reorient(B0map_fit .* mask), 'DisplayRange', []);
+% colormap(hot(256)); colorbar;
+% caxis([-60 60]);
+% title('Masked spherical harmonics fit [Hz]')
+% export_fig(fullfile(output_directory, 'B0map_fit_mask'), '-r400', '-tif');
 
 %% Fill empty space in raw B0 map with spherical harmonics fit
 B0map_fill = B0map_fit;
 B0map_fill(mask) = B0map_raw(mask);
 
-figure('Color', 'w');
-montage(reorient(B0map_fill), 'DisplayRange', []);
-colormap(hot(256)); colorbar;
-caxis([-60 60]);
-title('Raw + Spherical harmonics fit [Hz]')
-export_fig(fullfile(output_directory, 'B0map_fill'), '-r400', '-tif');
+% figure('Color', 'w');
+% montage(reorient(B0map_fill), 'DisplayRange', []);
+% colormap(hot(256)); colorbar;
+% caxis([-60 60]);
+% title('Raw + Spherical harmonics fit [Hz]')
+% export_fig(fullfile(output_directory, 'B0map_fill'), '-r400', '-tif');
 
 %% Perform TGV-based denoising on a static off-resonance map
 %--------------------------------------------------------------------------
@@ -306,30 +306,30 @@ B0map_tgv_mask = B0map_tgv .* mask_fill;
 B0map_fit_mask = B0map_fit .* mask_fill;
 
 %% Display results
-figure('Color', 'w');
-montage(reorient(mask_fill), 'DisplayRange', []);
-title('Mask without holes')
-export_fig(fullfile(output_directory, 'mask_fill'), '-r400', '-tif');
-
-figure('Color', 'w');
-montage(reorient(B0map_tgv), 'DisplayRange', []);
-colormap(hot(256)); colorbar;
-caxis([-60 60]);
-title('TGV smoothing [Hz]')
-export_fig(fullfile(output_directory, 'B0map_tgv'), '-r400', '-tif');
-
-figure('Color', 'w');
-montage(reorient(B0map_tgv_mask), 'DisplayRange', []);
-colormap(hot(256)); colorbar;
-caxis([-60 60]);
-title('TGV smoothing x mask [Hz]')
-export_fig(fullfile(output_directory, 'B0map_tgv_mask'), '-r400', '-tif');
-
-figure('Color', 'w');
-montage(reorient(B0map_fit_mask), 'DisplayRange', []);
-colormap(hot(256)); colorbar;
-caxis([-60 60]);
-title('Spherical harmonics fit x mask [Hz]')
-export_fig(fullfile(output_directory, 'B0map_fit_mask'), '-r400', '-tif');
+% figure('Color', 'w');
+% montage(reorient(mask_fill), 'DisplayRange', []);
+% title('Mask without holes')
+% export_fig(fullfile(output_directory, 'mask_fill'), '-r400', '-tif');
+% 
+% figure('Color', 'w');
+% montage(reorient(B0map_tgv), 'DisplayRange', []);
+% colormap(hot(256)); colorbar;
+% caxis([-60 60]);
+% title('TGV smoothing [Hz]')
+% export_fig(fullfile(output_directory, 'B0map_tgv'), '-r400', '-tif');
+% 
+% figure('Color', 'w');
+% montage(reorient(B0map_tgv_mask), 'DisplayRange', []);
+% colormap(hot(256)); colorbar;
+% caxis([-60 60]);
+% title('TGV smoothing x mask [Hz]')
+% export_fig(fullfile(output_directory, 'B0map_tgv_mask'), '-r400', '-tif');
+% 
+% figure('Color', 'w');
+% montage(reorient(B0map_fit_mask), 'DisplayRange', []);
+% colormap(hot(256)); colorbar;
+% caxis([-60 60]);
+% title('Spherical harmonics fit x mask [Hz]')
+% export_fig(fullfile(output_directory, 'B0map_fit_mask'), '-r400', '-tif');
 
 end

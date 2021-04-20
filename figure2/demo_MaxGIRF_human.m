@@ -189,9 +189,7 @@ elseif ~isempty(strfind(spiral_filename, 'ax'))
 end
 
 user_opts_cartesian.output_directory = output_directory;
-[im_echo,B0map,x_echo,y_echo,z_echo,TE_echo] = cartesian_B0map_recon(gre_noise_fullpaths, gre_data_fullpaths, gre_dat_fullpaths, user_opts_cartesian);
-B0map_true = B0map;
-
+[im_echo_orig,B0map_orig,x_echo,y_echo,z_echo,TE_echo] = cartesian_B0map_recon(gre_noise_fullpaths, gre_data_fullpaths, gre_dat_fullpaths, user_opts_cartesian);
 
 %% Load cartesian images
 load(fullfile(data_directory, 'd20201102_NV_brain'));
@@ -359,21 +357,21 @@ Nc = length(channel_range); % number of coils
 
 %% Zeropad a static off-resonance map
 if osf > 1
-    Bmap_orig = B0map;
-    [N1_,N2_,N3_] = size(B0map);
+    [N1_,N2_,N3_] = size(Bmap_orig);
     B0map = zeros(N1, N2, N3_, 'double');
     idx1_range = (-floor(N1_/2):ceil(N1_/2)-1).' + floor(N1/2) + 1;
     idx2_range = (-floor(N2_/2):ceil(N2_/2)-1).' + floor(N2/2) + 1;
-    idx3_range = (1:Ns).';
+    idx3_range = (1:Ns_).';
     B0map(idx1_range,idx2_range,idx3_range) = Bmap_orig;
 
-    im_echo_orig = im_echo;
     im_echo = zeros(N1, N2, N3_, 'double');
     idx1_range = (-floor(N1_/2):ceil(N1_/2)-1).' + floor(N1/2) + 1;
     idx2_range = (-floor(N2_/2):ceil(N2_/2)-1).' + floor(N2/2) + 1;
-    idx3_range = (1:Ns).';
+    idx3_range = (1:Ns_).';
     im_echo(idx1_range,idx2_range,idx3_range) = im_echo_orig(:,:,:,1);
-    
+else
+    B0map = B0map_orig;
+    im_echo = im_echo_orig;
 end
 
 %% Reconstruct images per slice
@@ -686,6 +684,9 @@ for idx = 9%:nr_recons
     end
     computation_time_nufft = toc(start_time_nufft);
 
+    return
+    
+    
     %% Calculate coil sensitivity maps
     tic; fprintf('(%2d/%2d): Calculating coil sensitivity maps with Walsh method... ', idx, nr_recons);
     %----------------------------------------------------------------------
