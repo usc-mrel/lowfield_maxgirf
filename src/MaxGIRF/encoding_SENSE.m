@@ -1,4 +1,4 @@
-function outp = encoding_SENSE(inp, csm, w, nufft_st, transpose_indicator)
+function outp = encoding_sense(inp, csm, w, nufft_st, transpose_indicator)
 % Written by Nam Gyun Lee
 % Email: nmgyunl@usc.edu, ggang56@gmail.com (preferred)
 % Started: 01/04/2021, Last modified: 01/04/2021

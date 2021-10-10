@@ -1,4 +1,4 @@
-function [im_echo,B0map_fit_mask,x_echo,y_echo,z_echo,TE,csm] = cartesian_B0map_recon(gre_noise_fullpaths, gre_data_fullpaths, gre_dat_fullpaths, user_opts_cartesian)
+function [im_echo,Masks,B0maps,x_echo,y_echo,z_echo,TEs,csm] = cartesian_B0map_recon(gre_noise_fullpaths, gre_data_fullpaths, gre_dat_fullpaths, user_opts_cartesian, save_figures)
 % Inputs
 %   gre_noise_full_paths    cell structure containing full paths to noise only h5 files
 %   gre_data_full_paths     cell structure containing full paths to mutlti-echo h5 files
@@ -9,8 +9,11 @@ function [im_echo,B0map_fit_mask,x_echo,y_echo,z_echo,TE,csm] = cartesian_B0map_
 output_directory = user_opts_cartesian.output_directory;
 zpad_factor      = user_opts_cartesian.zpad_factor;
 main_orientation = user_opts_cartesian.main_orientation;
-lambda           = user_opts_cartesian.lambda;
-maxiter_tgv      = user_opts_cartesian.maxiter_tgv;
+%lambda           = user_opts_cartesian.lambda;
+%maxiter_tgv      = user_opts_cartesian.maxiter_tgv;
+
+%% Define constants
+gamma = 4257.59 * (1e4 * 2 * pi); % gyromagnetic ratio for 1H [rad/sec/T]
 
 %% Read the first ismrmrd file to get header information
 start_time = tic;
@@ -21,6 +24,21 @@ if exist(gre_data_fullpaths{1}, 'file')
 else
     error('File %s does not exist.  Please generate it.' , gre_data_fullpaths{1});
 end
+
+%% Get imaging parameters from the XML header
+header = ismrmrd.xml.deserialize(dset.readxml);
+
+%--------------------------------------------------------------------------
+% Sequence parameters
+%--------------------------------------------------------------------------
+TR         = header.sequenceParameters.TR * 1e-3;     % [msec] * [sec/1e3msec] => [sec]
+TE         = header.sequenceParameters.TE * 1e-3;     % [msec] * [sec/1e3msec] => [sec]
+flip_angle = header.sequenceParameters.flipAngle_deg; % [degrees]
+
+%--------------------------------------------------------------------------
+% Experimental conditions
+%--------------------------------------------------------------------------
+B0 = header.experimentalConditions.H1resonanceFrequency_Hz * (2 * pi / gamma); % [Hz] * [2pi rad/cycle] / [rad/sec/T] => [T]
 
 %% Parse the ISMRMRD header
 raw_data = dset.readAcquisition(); % read all the acquisitions
@@ -37,7 +55,7 @@ N  = N1 * N2; % total number of voxels in image-space
 
 %% Reconstruct multi-echo GRE data
 im_echo = complex(zeros(N1, N2, N3, Ne, 'double'));
-TE = zeros(Ne, 1, 'double'); % [sec]
+TEs = zeros(Ne, 1, 'double'); % [sec]
 
 for idx = 1:Ne
     %----------------------------------------------------------------------
@@ -56,7 +74,7 @@ for idx = 1:Ne
     % Save the reconstructed image
     %----------------------------------------------------------------------
     im_echo(:,:,:,idx) = reshape(im, [N1 N2 N3]);
-    TE(idx) = header.sequenceParameters.TE * 1e-3; % [msec] * [sec/1e3msec] => [sec]
+    TEs(idx) = header.sequenceParameters.TE * 1e-3; % [msec] * [sec/1e3msec] => [sec]
 end
 
 %% Get spatial coordinates in DCS [m]
@@ -66,7 +84,6 @@ z_echo = reshape(z, [N1 N2 N3]); % N1 x N2 x N3
 
 %% Calculate a raw static off-resonance map [Hz]
 B0map_raw = zeros(N1, N2, N3, 'double'); % [Hz]
-
 for idx3 = 1:N3
     tic; fprintf('(%2d/%2d): Calculating a static off-resonance map... ', idx3, N3);
     nr_voxels = N1 * N2;
@@ -80,13 +97,13 @@ for idx3 = 1:N3
         %------------------------------------------------------------------
         [idx1,idx2] = ind2sub([N1 N2], idx);
         m = unwrap(reshape(angle(im_echo(idx1,idx2,idx3,:)), [Ne 1])); % [rad]
-        A = [TE ones(Ne,1)]; % [sec]
+        A = [TEs ones(Ne,1)]; % [sec]
         v = A \ m; % [rad/sec]
         B0map_raw(idx1,idx2,idx3) = v(1) / (2 * pi); % [rad/sec] * [cycle/2pi rad] => [Hz]
     end
     fprintf('done! (%6.4f/%6.4f sec)\n', toc, toc(start_time));
 end
-    
+
 %% Calculate a mask defining the image and noise regions using the iterative intermean algorithm
 %--------------------------------------------------------------------------
 % Calculate the maximum magnitude of images from all echo points
@@ -101,37 +118,6 @@ for idx = 1:N3
     level = isodata(im_max(:,:,idx), 'log');
     mask(:,:,idx) = (im_max(:,:,idx) > level);
 end
-
-%% Display results
-if main_orientation == 0 % sagittal plane
-    reorient = @(x) x;
-elseif main_orientation == 1 % coronal plane
-    reorient = @(x) x;
-elseif main_orientation == 2 % transverse plane
-    reorient = @(x) flip(rot90(x, -1), 2);
-end
-
-% figure('Color', 'w');
-% montage(reorient(im_max), 'DisplayRange', []);
-% export_fig(fullfile(output_directory, 'im_max'), '-r400', '-tif');
-% 
-% figure('Color', 'w');
-% montage(reorient(mask));
-% export_fig(fullfile(output_directory, 'mask'), '-r400', '-tif');
-% 
-% figure('Color', 'w');
-% montage(reorient(B0map_raw), 'DisplayRange', []);
-% colormap(hot(256)); colorbar;
-% caxis([-60 60]);
-% title('Raw static off-resonance map [Hz]')
-% export_fig(fullfile(output_directory, 'B0map'), '-r400', '-tif');
-% 
-% figure('Color', 'w');
-% montage(reorient(B0map_raw .* mask), 'DisplayRange', []);
-% colormap(hot(256)); colorbar;
-% caxis([-60 60]);
-% title('Masked raw static off-resonance map [Hz]')
-% export_fig(fullfile(output_directory, 'B0map_mask'), '-r400', '-tif');
 
 %% Calculate a smooth spherical harmonics approximation to the off-resonance map
 B0map_fit = zeros(N1, N2, N3, 'double');
@@ -246,31 +232,9 @@ for idx3 = 1:N3
     fprintf('done! (%6.4f/%6.4f sec)\n', toc, toc(start_time));
 end
 
-%% Display results
-% figure('Color', 'w');
-% montage(reorient(B0map_fit), 'DisplayRange', []);
-% colormap(hot(256)); colorbar;
-% caxis([-60 60]);
-% title('Spherical harmonics fit [Hz]')
-% export_fig(fullfile(output_directory, 'B0map_fit'), '-r400', '-tif');
-% 
-% figure('Color', 'w');
-% montage(reorient(B0map_fit .* mask), 'DisplayRange', []);
-% colormap(hot(256)); colorbar;
-% caxis([-60 60]);
-% title('Masked spherical harmonics fit [Hz]')
-% export_fig(fullfile(output_directory, 'B0map_fit_mask'), '-r400', '-tif');
-
 %% Fill empty space in raw B0 map with spherical harmonics fit
 B0map_fill = B0map_fit;
 B0map_fill(mask) = B0map_raw(mask);
-
-% figure('Color', 'w');
-% montage(reorient(B0map_fill), 'DisplayRange', []);
-% colormap(hot(256)); colorbar;
-% caxis([-60 60]);
-% title('Raw + Spherical harmonics fit [Hz]')
-% export_fig(fullfile(output_directory, 'B0map_fill'), '-r400', '-tif');
 
 %% Perform TGV-based denoising on a static off-resonance map
 %--------------------------------------------------------------------------
@@ -284,52 +248,125 @@ for idx = 1:N3
 end
 
 %% Fill the holes in the mask
-%----------------------------------------------------------------------
+%--------------------------------------------------------------------------
 % Fill voids
-%----------------------------------------------------------------------
+%--------------------------------------------------------------------------
 mask_fill = bwareaopen(mask, 30);
 mask_fill = imfill(mask_fill, 'holes');
 
-%----------------------------------------------------------------------
+%--------------------------------------------------------------------------
 % Dilate the mask
-%----------------------------------------------------------------------
+%--------------------------------------------------------------------------
 se = strel('disk', 6);
 mask_fill = imdilate(mask_fill, se);
 
-%----------------------------------------------------------------------
+%--------------------------------------------------------------------------
 % Fill voids again!
-%----------------------------------------------------------------------
+%--------------------------------------------------------------------------
 mask_fill = imfill(mask_fill, 'holes');
 
-%% Apply a mask on a TGV smoothed off-resonance map
-B0map_tgv_mask = B0map_tgv .* mask_fill;
-B0map_fit_mask = B0map_fit .* mask_fill;
+%% Return a structure containing all intermedicate off-resonance maps
+Masks = struct('mask', mask, 'mask_fill', mask_fill);
 
+B0maps = struct('B0map_raw' , B0map_raw , ...
+                'B0map_fit' , B0map_fit , ...
+                'B0map_fill', B0map_fill, ...
+                'B0map_tgv' , B0map_tgv);
+            
 %% Display results
-% figure('Color', 'w');
-% montage(reorient(mask_fill), 'DisplayRange', []);
-% title('Mask without holes')
-% export_fig(fullfile(output_directory, 'mask_fill'), '-r400', '-tif');
-% 
-% figure('Color', 'w');
-% montage(reorient(B0map_tgv), 'DisplayRange', []);
-% colormap(hot(256)); colorbar;
-% caxis([-60 60]);
-% title('TGV smoothing [Hz]')
-% export_fig(fullfile(output_directory, 'B0map_tgv'), '-r400', '-tif');
-% 
-% figure('Color', 'w');
-% montage(reorient(B0map_tgv_mask), 'DisplayRange', []);
-% colormap(hot(256)); colorbar;
-% caxis([-60 60]);
-% title('TGV smoothing x mask [Hz]')
-% export_fig(fullfile(output_directory, 'B0map_tgv_mask'), '-r400', '-tif');
-% 
-% figure('Color', 'w');
-% montage(reorient(B0map_fit_mask), 'DisplayRange', []);
-% colormap(hot(256)); colorbar;
-% caxis([-60 60]);
-% title('Spherical harmonics fit x mask [Hz]')
-% export_fig(fullfile(output_directory, 'B0map_fit_mask'), '-r400', '-tif');
+if save_figures == 1
+    if main_orientation == 0 % sagittal plane
+        reorient = @(x) x;
+    elseif main_orientation == 1 % coronal plane
+        reorient = @(x) x;
+    elseif main_orientation == 2 % transverse plane
+        reorient = @(x) flip(rot90(x, -1), 2);
+    end
+
+    for idx = 1:Ne
+        figure('Color', 'w');
+        montage(reorient(abs(im_echo(:,:,:,idx))), 'DisplayRange', []);
+        colormap(gray(256));
+        colorbar;
+        title(sprintf('Magnitude of echo %d', idx));
+        export_fig(fullfile(output_directory, sprintf('im_echo%d_mag', idx)), '-r400', '-tif');
+        
+        figure('Color', 'w');
+        montage(reorient(angle(im_echo(:,:,:,idx))*180/pi), 'DisplayRange', []);
+        colormap(hsv(256));
+        colorbar;
+        title(sprintf('Phase of echo %d', idx));
+        export_fig(fullfile(output_directory, sprintf('im_echo%d_phase', idx)), '-r400', '-tif');
+    end
+
+    figure('Color', 'w');
+    montage(reorient(im_max), 'DisplayRange', []);
+    export_fig(fullfile(output_directory, 'im_max'), '-r400', '-tif');
+
+    figure('Color', 'w');
+    montage(reorient(mask));
+    export_fig(fullfile(output_directory, 'mask'), '-r400', '-tif');
+
+    figure('Color', 'w');
+    montage(reorient(B0map_raw), 'DisplayRange', []);
+    colormap(hot(256)); colorbar;
+    caxis([-60 60]);
+    title('Raw static off-resonance map [Hz]')
+    export_fig(fullfile(output_directory, 'B0map_raw'), '-r400', '-tif');
+
+    figure('Color', 'w');
+    montage(reorient(B0map_raw .* mask), 'DisplayRange', []);
+    colormap(hot(256)); colorbar;
+    caxis([-60 60]);
+    title('Masked raw static off-resonance map [Hz]')
+    export_fig(fullfile(output_directory, 'B0map_mask'), '-r400', '-tif');
+
+    figure('Color', 'w');
+    montage(reorient(B0map_fit), 'DisplayRange', []);
+    colormap(hot(256)); colorbar;
+    caxis([-60 60]);
+    title('Spherical harmonics fit [Hz]')
+    export_fig(fullfile(output_directory, 'B0map_fit'), '-r400', '-tif');
+
+    figure('Color', 'w');
+    montage(reorient(B0map_fit .* mask), 'DisplayRange', []);
+    colormap(hot(256)); colorbar;
+    caxis([-60 60]);
+    title('Masked spherical harmonics fit [Hz]')
+    export_fig(fullfile(output_directory, 'B0map_fit_mask'), '-r400', '-tif');
+
+    figure('Color', 'w');
+    montage(reorient(B0map_fill), 'DisplayRange', []);
+    colormap(hot(256)); colorbar;
+    caxis([-60 60]);
+    title('Raw + Spherical harmonics fit [Hz]')
+    export_fig(fullfile(output_directory, 'B0map_fill'), '-r400', '-tif');
+
+    figure('Color', 'w');
+    montage(reorient(mask_fill), 'DisplayRange', []);
+    title('Mask without holes')
+    export_fig(fullfile(output_directory, 'mask_fill'), '-r400', '-tif');
+
+    figure('Color', 'w');
+    montage(reorient(B0map_tgv), 'DisplayRange', []);
+    colormap(hot(256)); colorbar;
+    caxis([-60 60]);
+    title('TGV smoothing [Hz]')
+    export_fig(fullfile(output_directory, 'B0map_tgv'), '-r400', '-tif');
+
+    figure('Color', 'w');
+    montage(reorient(B0map_tgv .* mask_fill), 'DisplayRange', []);
+    colormap(hot(256)); colorbar;
+    caxis([-60 60]);
+    title('TGV smoothing x mask [Hz]')
+    export_fig(fullfile(output_directory, 'B0map_tgv_mask'), '-r400', '-tif');
+
+    figure('Color', 'w');
+    montage(reorient(B0map_fit .* mask_fill), 'DisplayRange', []);
+    colormap(hot(256)); colorbar;
+    caxis([-60 60]);
+    title('Spherical harmonics fit x mask [Hz]')
+    export_fig(fullfile(output_directory, 'B0map_fit_mask'), '-r400', '-tif');
+end
 
 end

@@ -11,7 +11,6 @@ function [kPred, GPred] = apply_GIRF(gradients_nominal, dt, R, tRR)
 %
 % tRR is sub-dwell-time offset (-1 to 1) [0]?
 
-global delay_x delay_y;
 
 % handle "nasty" co-opting of R-variable to include field info.
 if isstruct(R)

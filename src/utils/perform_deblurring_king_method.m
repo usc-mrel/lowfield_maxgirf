@@ -1,4 +1,4 @@
-function [im_king, im_fs] = perform_deblurring_king_method(kspace, nufft_st, w, csm, gx, gy, gz, x, y, z, rotMatrixRCSToGCS, rotMatrixGCSToPCS, rotMatrixPCSToDCS, field_of_view_mm, DCS_offset, gamma, B0, dt)
+function [im_king, im_fs, tc, fc, fc_XYZ] = perform_deblurring_king_method(kspace, nufft_st, w, csm, gx, gy, gz, x, y, z, rotMatrixRCSToGCS, rotMatrixGCSToPCS, rotMatrixPCSToDCS, field_of_view_mm, DCS_offset, gamma, B0, dt)
 % Written by Nam Gyun Lee
 % Email: namgyunl@usc.edu, ggang56@gmail.com (preferred)
 % Started: 12/27/2020, Last modified: 12/27/2020
@@ -9,7 +9,7 @@ function [im_king, im_fs] = perform_deblurring_king_method(kspace, nufft_st, w, 
 
 %% Calculate the transformation matrix from RCS to DCS
 %--------------------------------------------------------------------------
-% From the paper: xyz in the physical coordinates
+% From King 1999 MRM: xyz in the physical coordinates
 % [x]   [a1 a2 a3][X]
 % [y] = [a4 a5 a6][Y]
 % [z]   [a7 a8 a9][Z]

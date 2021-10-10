@@ -54,7 +54,7 @@ EigenVals = zeros(imSize(1), imSize(2), min(nc,nv));
 
 start_time = tic;
 for n = 1:prod(imSize)
-    tic; fprintf('kernelEig (%d/%d)... ', n, prod(imSize));
+    %tic; fprintf('kernelEig (%d/%d)... ', n, prod(imSize));
     [x,y] = ind2sub([imSize(1),imSize(2)],n);
     mtx = squeeze(KERNEL(x,y,:,:));
 
@@ -66,7 +66,7 @@ for n = 1:prod(imSize)
     D = real(diag(D));
     EigenVals(x,y,:) = D(end:-1:1);
     EigenVecs(x,y,:,:) = C(:,end:-1:1);
-    fprintf('done! (%5.3f sec)\n', toc(start_time));
+    %fprintf('done! (%5.3f sec)\n', toc(start_time));
 end
 
 
