@@ -12,15 +12,11 @@ rng('default');
 %% Set directory names
 computer_type = computer;
 if strcmp(computer_type, 'PCWIN64')
-    src_directory = 'D:\lowfield_maxgirf';
-    ismrmrd_directory = 'D:\ismrmrd\ismrmrd';
-    data_parent_directory = 'D:\lowfield\NHLBI\data';
-    mida_directory = 'D:\lowfield_maxgirf\thirdparty\MIDA_v1.0\MIDA_v1_voxels';
+    src_directory = 'E:\lowfield_maxgirf';
+    mida_directory = 'E:\lowfield_maxgirf\thirdparty\MIDA_v1.0\MIDA_v1_voxels';
     mida_filename = 'MIDA_v1';
 elseif strcmp(computer_type, 'GLNXA64')
     src_directory = '/server/home/nlee/lowfield_maxgirf';
-    ismrmrd_directory = '/server/home/nlee/ismrmrd';
-    data_parent_directory = '/scratch/nlee/NHLBI/data';
     mida_directory = '/server/home/nlee/lowfield_maxgirf/thirdparty/MIDA_v1.0/MIDA_v1_voxels';
     mida_filename = 'MIDA_v1';
 end
