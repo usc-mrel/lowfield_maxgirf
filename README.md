@@ -13,12 +13,15 @@ Download ISMRMD datasets:
 
 ## Figure 3 (numerical simulation)
 
-Update variables `src_directory` and `mida_directory` in `demo_2d_spiral_simulation.m`
+1. Update variables `src_directory` and `mida_directory` in `demo_2d_spiral_simulation.m`.
 
     src_directory = 'E:\lowfield_maxgirf';
     mida_directory = 'E:\lowfield_maxgirf\thirdparty\MIDA_v1.0\MIDA_v1_voxels';
  
-And then run `demo_batch_2d_spiral_simulation.m`.
+2. Run `demo_batch_2d_spiral_simulation.m`.
+
+3. Run `demo_generate_figure3.m`.
+
  
 ## Figures 5 and 6 (human axial spiral spin-echo imaging)
 
