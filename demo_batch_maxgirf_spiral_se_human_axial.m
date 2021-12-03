@@ -9,7 +9,7 @@ close all; clear; clc;
 %% 20201102_NV_brain, axial
 computer_type = computer;
 if strcmp(computer_type, 'PCWIN64')
-    B0map_fullpath = 'D:\lowfield_maxgirf\B0map_nlinv_min1.0e-06_axial.mat';
+    B0map_fullpath = 'E:\lowfield_maxgirf\B0map_nlinv_min1.0e-06_axial.mat';
     data_directory = 'D:\lowfield\NHLBI\data\20201102_NV_brain';
 elseif strcmp(computer_type, 'GLNXA64')
     B0map_fullpath = '/server/home/nlee/lowfield_maxgirf/B0map_nlinv_min1.0e-06_axial.mat';

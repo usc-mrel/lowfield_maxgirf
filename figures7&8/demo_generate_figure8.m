@@ -216,6 +216,17 @@ text(N2_box1*1, N1_box1*2+1, {'C'}, 'Color', color_order(3,:), 'FontSize', 14, '
 text(N2_box1*2, N1_box1*2+1, {'D'}, 'Color', color_order(3,:), 'FontSize', 14, 'Rotation', 0, 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right');
 text(2, 0, {'(E)'}, 'Color', 'w', 'FontSize', 14, 'Rotation', 0, 'VerticalAlignment', 'top', 'HorizontalAlignment', 'left');
 
+hold on;
+annotation(gcf, 'arrow', [0.7655 0.7536]      , [0.8470 0.8570]      , 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+annotation(gcf, 'arrow', [0.7655 0.7536]-0.105, [0.8470 0.8570]      , 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+annotation(gcf, 'arrow', [0.7655 0.7536]-0.105, [0.8470 0.8570]-0.123, 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+annotation(gcf, 'arrow', [0.7655 0.7536]      , [0.8470 0.8570]-0.123, 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+
+annotation(gcf, 'arrow', [0.7655 0.7536]-0.035      , [0.8470 0.8570]-0.055      , 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+annotation(gcf, 'arrow', [0.7655 0.7536]-0.035-0.105, [0.8470 0.8570]-0.055      , 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+annotation(gcf, 'arrow', [0.7655 0.7536]-0.035-0.105, [0.8470 0.8570]-0.055-0.123, 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+annotation(gcf, 'arrow', [0.7655 0.7536]-0.035      , [0.8470 0.8570]-0.055-0.123, 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+
 %--------------------------------------------------------------------------
 % King's method without B0 correction
 %--------------------------------------------------------------------------
@@ -223,7 +234,7 @@ ax4 = subplot(3,3,4);
 imagesc(abs(im3(idx1_range,idx2_range))); axis image off;
 caxis([0 cmax]);
 colormap(gca, gray(256));
-text(N2_zoom/2, 0, {'King''s method w/o B0'}, 'Color', color_order(3,:), 'FontSize', 14, 'Rotation', 0, 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center');
+text(N2_zoom/2, 0, {'King''s method'}, 'Color', color_order(3,:), 'FontSize', 14, 'Rotation', 0, 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center');
 text(2, 0, {'(C)'}, 'Color', 'w', 'FontSize', 14, 'Rotation', 0, 'VerticalAlignment', 'top', 'HorizontalAlignment', 'left');
 
 %--------------------------------------------------------------------------
@@ -251,6 +262,18 @@ text(N2_box2*1, N1_box2*1, {'C'}, 'Color', color_order(3,:), 'FontSize', 14, 'Ro
 text(N2_box2*2, N1_box2*1, {'D'}, 'Color', color_order(3,:), 'FontSize', 14, 'Rotation', 0, 'VerticalAlignment', 'top', 'HorizontalAlignment', 'right');
 text(2, 0, {'(F)'}, 'Color', 'w', 'FontSize', 14, 'Rotation', 0, 'VerticalAlignment', 'top', 'HorizontalAlignment', 'left');
 
+hold on;
+annotation(gcf, 'arrow', [0.7430 0.7303]      , [0.5543 0.5434]      , 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+annotation(gcf, 'arrow', [0.7430 0.7303]-0.105, [0.5543 0.5434]      , 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+annotation(gcf, 'arrow', [0.7430 0.7303]      , [0.5543 0.5434]-0.126, 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+annotation(gcf, 'arrow', [0.7430 0.7303]-0.105, [0.5543 0.5434]-0.126, 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+
+annotation(gcf, 'arrow', [0.7430 0.7303]+0.008      , [0.5543 0.5434]+0.075      , 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+annotation(gcf, 'arrow', [0.7430 0.7303]+0.008-0.105, [0.5543 0.5434]+0.075      , 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+annotation(gcf, 'arrow', [0.7430 0.7303]+0.008-0.105, [0.5543 0.5434]+0.075-0.126, 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+annotation(gcf, 'arrow', [0.7430 0.7303]+0.008      , [0.5543 0.5434]+0.075-0.126, 'Color', 'r', 'HeadSize', 6, 'HeadStyle', 'plain', 'LineWidth', 2);
+
+
 %--------------------------------------------------------------------------
 % static off-resonance map
 %--------------------------------------------------------------------------
@@ -259,9 +282,11 @@ imagesc(B0map(idx1_range,idx2_range,actual_slice_nr)); axis image off;
 caxis([-100 100]);
 colormap(gca, hot(256));
 text(N2_zoom/2, 0, {'Static off-resonance'}, 'Color', color_order(3,:), 'FontSize', 14, 'Rotation', 0, 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center');
-hc1 = colorbar('SouthOutside');
-set(hc1, 'FontSize', 10, 'Color', 'w', 'Position', [0.1461 0.1364 0.1536 0.0151]);
-title(hc1, '[Hz]', 'Color', 'w', 'Position', [110 0.654 0]); % [125.5275 0.654 0]
+hc1 = colorbar('WestOutside');
+%set(hc1, 'FontSize', 10, 'Color', 'w', 'Position', [0.1461 0.1364 0.1536 0.0151]);
+%title(hc1, '[Hz]', 'Color', 'w', 'Position', [110 0.654 0]); % [125.5275 0.654 0]
+set(hc1, 'FontSize', 10, 'Color', 'w', 'Position', [0.1461-0.04 0.1138+0.02 0.0151 0.2503-0.05]);
+title(hc1, '[Hz]', 'Color', 'w', 'Position', [5 138.154 0]); % [125.5275 0.654 0]
 text(2, 0, {'(G)'}, 'Color', 'w', 'FontSize', 14, 'Rotation', 0, 'VerticalAlignment', 'top', 'HorizontalAlignment', 'left');
 
 %--------------------------------------------------------------------------
@@ -317,5 +342,4 @@ set(ax7, 'Position', [0.1300 0.0682 0.2134 0.3412]);
 set(ax8, 'Position', [0.3470 0.0682 0.2134 0.3412]);
 set(ax9, 'Position', [0.5640 0.0682 0.2134 0.3412]);
 
-export_fig('figure8', '-r400', '-tif', ...
-   '-c[180,630,440,480]'); % [top,right,bottom,left]
+export_fig('figure8', '-r400', '-tif', '-c[180,630,440,260]'); % [top,right,bottom,left]

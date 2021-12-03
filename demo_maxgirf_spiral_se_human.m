@@ -30,7 +30,7 @@
 %% Set directory names
 computer_type = computer;
 if strcmp(computer_type, 'PCWIN64')
-    src_directory = 'D:\lowfield_maxgirf';
+    src_directory = 'E:\lowfield_maxgirf';
     ismrmrd_directory = 'D:\ismrmrd\ismrmrd';
 elseif strcmp(computer_type, 'GLNXA64')
     src_directory = '/server/home/nlee/lowfield_maxgirf';
@@ -47,7 +47,6 @@ spiral_data_fullpath  = fullfile(data_directory, 'h5'   , sprintf('%s.h5', spira
 spiral_noise_fullpath = fullfile(data_directory, 'noise', sprintf('noise_%s.h5', spiral_filename));
 spiral_dat_fullpath   = fullfile(data_directory, sprintf('%s.dat', spiral_filename));
 spiral_dat_fullpath = '';
-
 
 %% Define an output directory
 [filepath,data_filename] = fileparts(data_directory);
@@ -252,7 +251,7 @@ nr_recons = nr_slices * nr_contrasts * nr_phases * nr_repetitions * nr_sets * nr
 %slice : 1,3,5,7,9,11,2,4,6,8,10
 %10 for axial
 
-for idx = 1:nr_recons
+for idx = 10%1:nr_recons
     %% Get information about the current slice
     [slice_nr, contrast_nr, phase_nr, repetition_nr, set_nr, segment_nr] = ind2sub([nr_slices nr_contrasts nr_phases nr_repetitions nr_sets nr_segments], idx);
     fprintf('(%2d/%2d): Reconstructing slice (slice = %2d, contrast = %2d, phase = %2d, repetition = %2d, set = %2d, segment = %2d)\n', idx, nr_recons, slice_nr, contrast_nr, phase_nr, repetition_nr, set_nr, segment_nr);
@@ -368,9 +367,9 @@ for idx = 1:nr_recons
         %------------------------------------------------------------------
         % Get a list of profiles in the current slice
         %------------------------------------------------------------------
-        sag_offset = double(raw_data.head.position(1,1)); % [mm]
-        cor_offset = double(raw_data.head.position(2,1)); % [mm]
-        tra_offset = double(raw_data.head.position(3,1)); % [mm]
+        sag_offset = double(raw_data.head.position(1,slice_nr)); % [mm]
+        cor_offset = double(raw_data.head.position(2,slice_nr)); % [mm]
+        tra_offset = double(raw_data.head.position(3,slice_nr)); % [mm]
         PCS_offset = [sag_offset; cor_offset; tra_offset] * 1e-3; % [mm] * [m/1e3mm] => [m]
 
         % It seems that there is a bug in the pulse sequence
@@ -392,11 +391,13 @@ for idx = 1:nr_recons
         % Calculate a rotation matrix from GCS to PCS from Siemens raw data
         %------------------------------------------------------------------
         [rotMatrixGCSToPCS,PE_sign,RO_sign,main_orientation] = calcMatrixGCSToPCS(dNormalSag, dNormalCor, dNormalTra, dRotAngle);
+        
+        
     else
         %------------------------------------------------------------------
         % Get a rotation matrix from GCS to PCS (ISMRMRD format)
         %------------------------------------------------------------------
-        rotMatrixGCSToPCS = double([raw_data.head.phase_dir(:,1) raw_data.head.read_dir(:,1) raw_data.head.slice_dir(:,1)]);
+        rotMatrixGCSToPCS = double([raw_data.head.phase_dir(:,slice_nr) raw_data.head.read_dir(:,slice_nr) raw_data.head.slice_dir(:,slice_nr)]);
         rotMatrixGCSToPCS(:,1) = PE_sign * rotMatrixGCSToPCS(:,1);
         rotMatrixGCSToPCS(:,2) = RO_sign * rotMatrixGCSToPCS(:,2);
     end
@@ -568,13 +569,6 @@ for idx = 1:nr_recons
     end
 
     %% Perform NUFFT reconstruction
-    %----------------------------------------------------------------------
-    % Prepare an NUFFT structure using k-space trajectories in RCS
-    % Note: RCS <=> GCS (PRS)
-    % ku:[PE]   [0 1 0] * [r]
-    % kv:[RO] = [1 0 0] * [c]
-    % kw:[SL]   [0 0 1] * [s]
-    %----------------------------------------------------------------------
     % scaled to [-0.5,0.5] and then [-pi,pi]
     % [rad/m] / ([cycle/cm] * [2pi rad/cycle] * [1e2cm/m]) => [rad/m] / [rad/m] = [unitless] ([-0.5,0.5]) * 2pi => [-pi,pi]
     % The definition of FFT is opposite in NUFFT
@@ -622,6 +616,22 @@ for idx = 1:nr_recons
 
     %% Perform optimal coil combination for NUFFT reconstruction
     im_nufft = sum(imc_nufft .* conj(csm), 3);
+    
+    %% Perform King's method for concomitant field correction
+    tstart = tic; fprintf('(%2d/%2d): Performing King''s method...\n', idx, nr_recons);
+    [im_king,im_fs] = perform_deblurring_king_method(double(kspace), nufft_st, w, csm, ...
+	   reshape(g_dcs(:,1,:), [Nk Ni]), reshape(g_dcs(:,2,:), [Nk Ni]), reshape(g_dcs(:,3,:), [Nk Ni]), ...
+	   x, y, z, rotMatrixRCSToGCS, rotMatrixGCSToPCS, rotMatrixPCSToDCS, field_of_view_mm, DCS_offset, gamma, B0, dt);
+    fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
+
+    %% Perform King's method with a standard B0 correction
+    if main_orientation == TRANSVERSE
+        tstart = tic; fprintf('(%2d/%2d): Performing King''s method with a standard B0 correction...\n', idx, nr_recons);
+        [im_king_with_B0_correction,im_fs] = perform_deblurring_king_method_with_B0_correction(double(kspace), nufft_st, w, csm, ...
+            reshape(g_dcs(:,1,:), [Nk Ni]), reshape(g_dcs(:,2,:), [Nk Ni]), reshape(g_dcs(:,3,:), [Nk Ni]), ...
+            x, y, z, rotMatrixRCSToGCS, rotMatrixGCSToPCS, rotMatrixPCSToDCS, field_of_view_mm, DCS_offset, gamma, B0, dt, B0map(:,:,actual_slice_nr));
+        fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
+    end
 
     %% Perform CG-SENSE reconstruction
     tstart = tic; fprintf('(%2d/%2d): Performing CG-SENSE reconstruction...\n', idx, nr_recons);
@@ -633,12 +643,7 @@ for idx = 1:nr_recons
     im_sense = reshape(m_sense, [N1 N2]);
     fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
 
-    %% Perform King's method for concomitant field correction
-    tstart = tic; fprintf('(%2d/%2d): Performing King''s method...\n', idx, nr_recons);
-    [im_king, im_fs, tc, fc, fc_XYZ] = perform_deblurring_king_method(double(kspace), nufft_st, w, csm, reshape(g_dcs(:,1,:), [Nk Ni]), reshape(g_dcs(:,2,:), [Nk Ni]), reshape(g_dcs(:,3,:), [Nk Ni]), x, y, z, rotMatrixRCSToGCS, rotMatrixGCSToPCS, rotMatrixPCSToDCS, field_of_view_mm, DCS_offset, gamma, B0, dt);
-    fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
-
-    %% Estimate coil sensitivity maps using ESPIRiT
+    %% Estimate a mask for limited spatial support using ESPIRiT
     if support_constraint
         tstart = tic; fprintf('(%2d/%2d): Calculating coil sensitivity maps with ESPIRiT... ', idx, nr_recons);
         %------------------------------------------------------------------
@@ -697,34 +702,25 @@ for idx = 1:nr_recons
     %% Calculate the SVD of the higher-order encoding matrix (Nk x N)
     start_time_svd = tic;
     os = 5; % oversampling parameter for randomized SVD
-    u_tilde = complex(zeros(Nk, Lmax, Ni, 'double'));
-    v_tilde = complex(zeros(N , Lmax, Ni, 'double'));
-    singular_values = complex(zeros(Lmax, Lmax, Ni, 'double'));
+    u = complex(zeros(Nk, Lmax, Ni, 'double'));
+    v = complex(zeros(N , Lmax, Ni, 'double'));
+    s = complex(zeros(Lmax, Lmax, Ni, 'double'));
     for i = 1:Ni
         tstart = tic; fprintf('(%2d/%2d): Calculating the randomized SVD (i=%2d/%2d)... \n', idx, nr_recons, i, Ni);
         [U,S,V] = calculate_rsvd_higher_order_encoding_matrix(k(:,4:end,i), p(:,4:end), Lmax, os, vec(B0map(:,:,actual_slice_nr)), t, static_B0_correction);
-        u_tilde(:,:,i) = U(:,1:Lmax); % Nk x Lmax
-        v_tilde(:,:,i) = V(:,1:Lmax) * S(1:Lmax,1:Lmax)'; % N x Lmax
-        singular_values(:,:,i) = S(1:Lmax,1:Lmax);
+        u(:,:,i) = U(:,1:Lmax); % Nk x Lmax
+        v(:,:,i) = V(:,1:Lmax) * S(1:Lmax,1:Lmax)'; % N x Lmax
+        s(:,:,i) = S(1:Lmax,1:Lmax);
         fprintf('(%2d/%2d): Calculating the randomized SVD (i=%2d/%2d)... done! (%6.4f/%6.4f sec)\n', idx, nr_recons, i, Ni, toc(tstart), toc(start_time));
     end
     computation_time_svd = toc(start_time_svd);
 
     %% Calculate NUFFT structures for lowrank MaxGIRF reconstruction
-    %----------------------------------------------------------------------
-    % Prepare an NUFFT structure using k-space trajectories in RCS
-    % Note: RCS <=> GCS (PRS)
-    % ku:[PE]   [0 1 0] * [r]
-    % kv:[RO] = [1 0 0] * [c]
-    % kw:[SL]   [0 0 1] * [s]
-    %----------------------------------------------------------------------
     st = cell(Ni,1);
     for i = 1:Ni
         tstart = tic; fprintf('(%2d/%2d): Calculating NUFFT structure... ', i, Ni);
         % scaled to [-0.5,0.5] and then [-pi,pi]
         % [rad/m] / ([cycle/cm] * [2pi rad/cycle] * [1e2cm/m]) => [rad/m] / [rad/m] = [unitless]
-        %k_rcs = cat(2, kv_predicted(:,i), ku_predicted(:,i)) / (2 * krmax * 2 * pi * 1e2); % [-0.5,0.5]
-        %om = -k_rcs * 2 * pi; % The definition of FFT is opposite in NUFFT
         om = -cat(2, k_rcs(:,1,i), k_rcs(:,2,i)) / (2 * krmax * 1e2); % Nk x 2
         Nd = [N1 N2];   % matrix size
         Jd = [6 6];     % kernel size
@@ -734,7 +730,7 @@ for idx = 1:nr_recons
     end
 
     %% Perform conjugate phase reconstruction using the MaxGIRF encoding model
-    b = zeros(N, Lmax, 'double');
+    b = complex(zeros(N, Lmax, 'double'));
     for i = 1:Ni
         Nd = st{i}.Nd;
         tstart = tic; fprintf('(%d/%d): Calculating conjugate phase reconstruction (i=%d/%d)... ', idx, nr_recons, i, Ni);
@@ -753,8 +749,8 @@ for idx = 1:nr_recons
             AHd_ = zeros(N, 1, 'double');
             for ell = 1:Lmax
                 % Preconditioning with density compensation
-                FHDuHd = nufft_adj((conj(u_tilde(:,ell,i)) .* d) .* w(:,i), st{i}) / sqrt(prod(Nd));
-                AHd_ = AHd_ + v_tilde(:,ell,i) .* reshape(FHDuHd, [N 1]);
+                FHDuHd = nufft_adj((conj(u(:,ell,i)) .* d) .* w(:,i), st{i}) / sqrt(prod(Nd));
+                AHd_ = AHd_ + v(:,ell,i) .* reshape(FHDuHd, [N 1]);
                 AHd(:,ell) = AHd_;
             end
 
@@ -776,18 +772,18 @@ for idx = 1:nr_recons
     end
     im_maxgirf_cpr = reshape(b, [N1 N2 Lmax]);
 
-    if 0
     %% Perform lowrank MaxGIRF reconstruction
+    if 0
     start_time_maxgirf = tic; fprintf('(%d/%d): Performing lowrank MaxGIRF reconstruction...\n', idx, nr_recons);
     max_iterations = 15;
     limit = 1e-5;
-    E = @(x,tr) encoding_lowrank_maxgirf(x, csm, u_tilde(:,1:L,:), v_tilde(:,1:L,:), w, st, tr);
+    E = @(x,tr) encoding_lowrank_maxgirf(x, csm, u(:,1:L,:), v(:,1:L,:), w, st, tr);
     [m_lowrank, flag, relres, iter, resvec, lsvec] = lsqr(E, b(:,L), limit, max_iterations, [], [], []); % NL x 1
     im_maxgirf_lowrank = reshape(m_lowrank, [N1 N2]);
     computation_time_maxgirf = toc(start_time_maxgirf);
     fprintf('done! (%6.4f/%6.4f sec)\n', computation_time_maxgirf, toc(start_time));
     end
-
+    
     %% Save each reconstruction in a mat file
     %----------------------------------------------------------------------
     % Save k and p
@@ -802,32 +798,42 @@ for idx = 1:nr_recons
     %----------------------------------------------------------------------
     output_fullpath = fullfile(output_directory, sprintf('nufft_slice%d', idx));
     tstart = tic; fprintf('Saving results: %s... ', output_fullpath);
-    save(output_fullpath, 'im_nufft', '-v7.3');
+    save(output_fullpath, 'im_nufft', 'slice_nr', 'actual_slice_nr', '-v7.3');
     fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
 
     %----------------------------------------------------------------------
-    % Save NUFFT reconstruction with King's method
+    % Save King's method without a B0 correction
     %----------------------------------------------------------------------
     output_fullpath = fullfile(output_directory, sprintf('king_slice%d', idx));
     tstart = tic; fprintf('Saving results: %s... ', output_fullpath);
-    save(output_fullpath, 'im_king', 'mask_support', '-v7.3');
+    save(output_fullpath, 'im_king', 'slice_nr', 'actual_slice_nr', '-v7.3');
     fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
+
+    %----------------------------------------------------------------------
+    % Save King's method with a B0 correction
+    %----------------------------------------------------------------------
+    if main_orientation == TRANSVERSE
+        output_fullpath = fullfile(output_directory, sprintf('king_with_B0_correction_slice%d', idx));
+        tstart = tic; fprintf('Saving results: %s... ', output_fullpath);
+        save(output_fullpath, 'im_king_with_B0_correction', 'slice_nr', 'actual_slice_nr');
+        fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
+    end
 
     %----------------------------------------------------------------------
     % Save conjugate phase reconstruction (MaxGIRF)
     %----------------------------------------------------------------------
     output_fullpath = fullfile(output_directory, sprintf('maxgirf_cpr_slice%d', idx));
     tstart = tic; fprintf('Saving results: %s... ', output_fullpath);
-    save(output_fullpath, 'im_maxgirf_cpr', 'singular_values', 'computation_time_svd', '-v7.3');
+    save(output_fullpath, 'im_maxgirf_cpr', 's', 'computation_time_svd', 'Lmax', 'L', 'slice_nr', 'actual_slice_nr', '-v7.3');
     fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
 
-    if 0
     %----------------------------------------------------------------------
     % Save iterative MaxGIRF reconstruction with a lowrank approximation
     %----------------------------------------------------------------------
+    if 0
     output_fullpath = fullfile(output_directory, sprintf('maxgirf_lowrank_slice%d', idx));
     tstart = tic; fprintf('Saving results: %s... ', output_fullpath);
-    save(output_fullpath, 'im_maxgirf_lowrank', 'computation_time_maxgirf', '-v7.3');
+    save(output_fullpath, 'im_maxgirf_lowrank', 'computation_time_maxgirf', 'slice_nr', 'actual_slice_nr', '-v7.3');
     fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
     end
 end

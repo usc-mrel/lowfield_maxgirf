@@ -9,7 +9,7 @@ close all; clear; clc;
 %% 20201102_NV_brain, sagittal
 computer_type = computer;
 if strcmp(computer_type, 'PCWIN64')
-    B0map_fullpath = 'D:\lowfield_maxgirf\B0map_nlinv_min1.0e-06_sagittal.mat';
+    B0map_fullpath = 'E:\lowfield_maxgirf\B0map_nlinv_min1.0e-06_sagittal.mat';
     data_directory = 'D:\lowfield\NHLBI\data\20201102_NV_brain';
 elseif strcmp(computer_type, 'GLNXA64')
     B0map_fullpath = '/server/home/nlee/lowfield_maxgirf/B0map_nlinv_min1.0e-06_sagittal.mat';
@@ -42,6 +42,8 @@ RO_sign = -1;
 static_B0_correction = 1;
 concomitant_field_correction = 0;
 demo_maxgirf_spiral_se_human;
+
+return
 
 %% Without B0 correction and with concomitant field correction
 static_B0_correction = 0;

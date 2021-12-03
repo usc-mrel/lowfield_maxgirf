@@ -11,9 +11,9 @@ if Nl >= 6 , p(:,6)  = z.^2;        end
 if Nl >= 7 , p(:,7)  = x .* y;      end
 if Nl >= 8 , p(:,8)  = y .* z;      end
 if Nl >= 9 , p(:,9)  = x .* z;      end
-if Nl >= 10, p(:,10)  = x.^3;        end
-if Nl >= 11, p(:,11)  = y.^3;        end
-if Nl >= 12, p(:,12)  = z.^3;        end
+if Nl >= 10, p(:,10)  = x.^3;       end
+if Nl >= 11, p(:,11)  = y.^3;       end
+if Nl >= 12, p(:,12)  = z.^3;       end
 if Nl >= 13, p(:,13) = x.^2 .* y;   end
 if Nl >= 14, p(:,14) = x.^2 .* z;   end
 if Nl >= 15, p(:,15) = x.* y.^2;    end
