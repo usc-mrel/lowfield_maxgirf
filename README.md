@@ -11,9 +11,9 @@ Nam Gyun Lee, University of Southern California, Dec 2021.
 
 Download ISMRMD datasets:
 
-Example directory structure for the datasets:
+Once datasets are downloaded, organize datasets in this structure:
  
-     |---20201102_NV_brain
+     |---path-to-dataset (e.g., D:\lowfield\NHLBI\data\20201102_NV_brain)
          |---d20201102_NV_brain.mat
          |---h5
              |---meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5
