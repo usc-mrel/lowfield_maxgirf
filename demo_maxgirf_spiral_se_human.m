@@ -618,11 +618,12 @@ for idx = 10%1:nr_recons
     im_nufft = sum(imc_nufft .* conj(csm), 3);
     
     %% Perform King's method for concomitant field correction
-    tstart = tic; fprintf('(%2d/%2d): Performing King''s method...\n', idx, nr_recons);
+    start_time_king = tic; fprintf('(%2d/%2d): Performing King''s method...\n', idx, nr_recons);
     [im_king,im_fs] = perform_deblurring_king_method(double(kspace), nufft_st, w, csm, ...
 	   reshape(g_dcs(:,1,:), [Nk Ni]), reshape(g_dcs(:,2,:), [Nk Ni]), reshape(g_dcs(:,3,:), [Nk Ni]), ...
 	   x, y, z, rotMatrixRCSToGCS, rotMatrixGCSToPCS, rotMatrixPCSToDCS, field_of_view_mm, DCS_offset, gamma, B0, dt);
-    fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
+    computation_time_king = toc(start_time_king);
+    fprintf('done! (%6.4f/%6.4f sec)\n', computation_time_king, toc(start_time));
 
     %% Perform King's method with a standard B0 correction
     if main_orientation == TRANSVERSE
@@ -730,6 +731,7 @@ for idx = 10%1:nr_recons
     end
 
     %% Perform conjugate phase reconstruction using the MaxGIRF encoding model
+    start_time_cpr = tic;
     b = complex(zeros(N, Lmax, 'double'));
     for i = 1:Ni
         Nd = st{i}.Nd;
@@ -770,10 +772,10 @@ for idx = 10%1:nr_recons
         end
         fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
     end
+    computation_time_cpr = toc(start_time_cpr);
     im_maxgirf_cpr = reshape(b, [N1 N2 Lmax]);
 
     %% Perform lowrank MaxGIRF reconstruction
-    if 0
     start_time_maxgirf = tic; fprintf('(%d/%d): Performing lowrank MaxGIRF reconstruction...\n', idx, nr_recons);
     max_iterations = 15;
     limit = 1e-5;
@@ -782,7 +784,6 @@ for idx = 10%1:nr_recons
     im_maxgirf_lowrank = reshape(m_lowrank, [N1 N2]);
     computation_time_maxgirf = toc(start_time_maxgirf);
     fprintf('done! (%6.4f/%6.4f sec)\n', computation_time_maxgirf, toc(start_time));
-    end
     
     %% Save each reconstruction in a mat file
     %----------------------------------------------------------------------
@@ -824,16 +825,14 @@ for idx = 10%1:nr_recons
     %----------------------------------------------------------------------
     output_fullpath = fullfile(output_directory, sprintf('maxgirf_cpr_slice%d', idx));
     tstart = tic; fprintf('Saving results: %s... ', output_fullpath);
-    save(output_fullpath, 'im_maxgirf_cpr', 's', 'computation_time_svd', 'Lmax', 'L', 'slice_nr', 'actual_slice_nr', '-v7.3');
+    save(output_fullpath, 'im_maxgirf_cpr', 'slice_nr', 'actual_slice_nr', 'computation_time_cpr', 's', 'computation_time_svd', 'Lmax', 'L', '-v7.3');
     fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
 
     %----------------------------------------------------------------------
     % Save iterative MaxGIRF reconstruction with a lowrank approximation
     %----------------------------------------------------------------------
-    if 0
     output_fullpath = fullfile(output_directory, sprintf('maxgirf_lowrank_slice%d', idx));
     tstart = tic; fprintf('Saving results: %s... ', output_fullpath);
     save(output_fullpath, 'im_maxgirf_lowrank', 'computation_time_maxgirf', 'slice_nr', 'actual_slice_nr', '-v7.3');
     fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
-    end
 end
