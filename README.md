@@ -44,7 +44,7 @@ Update variables `src_directory` and `ismrmrd_directory` in `demo_maxgirf_spiral
 Update variables `B0map_fullpath` and `data_directory` in `demo_batch_maxgirf_spiral_se_human_axial.m`.
 
     B0map_fullpath = 'path-to-this-package\B0map_nlinv_min1.0e-06_axial.mat';
-    data_directory = 'path-to-human-dataset\20201102_NV_brain';
+    data_directory = 'path-to-dataset';
 
 Run `demo_batch_maxgirf_spiral_se_human_axial.m`.
 
@@ -54,13 +54,13 @@ Run `figures5&6\demo_generate_figure5.m` and `figures5&6\demo_generate_figure6.m
 
 Update variables `src_directory` and `ismrmrd_directory` in `demo_maxgirf_spiral_se_human.m`.
 
-    src_directory = 'E:\lowfield_maxgirf';
-    ismrmrd_directory = 'D:\ismrmrd\ismrmrd';
+    src_directory = 'path-to-this-package';
+    ismrmrd_directory = 'path-to-ISMRMRD-package';
 
 Update variables `B0map_fullpath` and `data_directory` in `demo_batch_maxgirf_spiral_se_human_sagittal.m`.
 
-    B0map_fullpath = 'E:\lowfield_maxgirf\B0map_nlinv_min1.0e-06_sagittal.mat';
-    data_directory = 'D:\lowfield\NHLBI\data\20201102_NV_brain';
+    B0map_fullpath = 'path-to-this-package\B0map_nlinv_min1.0e-06_sagittal.mat';
+    data_directory = 'path-to-dataset';
 
 Run `demo_batch_maxgirf_spiral_se_human_sagittal.m`.
 
