@@ -14,13 +14,13 @@ Download ISMRMD datasets:
 Example directory structure for the datasets:
  
      |---20201102_NV_brain           
-		   |---d20201102_NV_brain.mat           
-		   |---h5		   
-       	        |---meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5				
-				|---meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5		   
-		   |---noise		        
-				|---noise_meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5		        
-				|---noise_meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5
+		 |---d20201102_NV_brain.mat           
+		 |---h5		   
+       	     |---meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5				
+			 |---meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5		   
+		 |---noise		        
+		     |---noise_meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5		        
+			 |---noise_meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5
  
 
 ## Figure 3 (numerical simulation)
