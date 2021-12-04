@@ -28,7 +28,7 @@ Nam Gyun Lee, University of Southern California, Dec 2021.
 * **Sagittal spiral spin-echo dataset**
   - [meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5](https://drive.google.com/file/d/1NOh64QtBmbyImTiHzzqwuV_GXiyfvvAR/view?usp=sharing)
 
-* **Sagittal GRE datasets**:
+* **Sagittal GRE datasets**
   - [meas_MID00261_FID03644_gre_TE1.h5](https://drive.google.com/file/d/11wJrXucCl9j7Q1LXP3SClGrycmmaatWu/view?usp=sharing)
   - [meas_MID00262_FID03645_gre_TE2.h5](https://drive.google.com/file/d/1aep6XWc8Ijjjw2nFGCCagTu2wLzLFP6W/view?usp=sharing)
   - [meas_MID00263_FID03646_gre_TE3.h5](https://drive.google.com/file/d/1d3-0V6vniSekO160inIsLdCujF20UjjS/view?usp=sharing)
@@ -41,7 +41,7 @@ Nam Gyun Lee, University of Southern California, Dec 2021.
 * **Mat file containing reconstructed Cartesian spin-echo images**
   - [d20201102_NV_brain.mat](https://drive.google.com/file/d/1yU42YylEXz8YH_UbEsBLQceD0ywTYFfb/view?usp=sharing)
 
-* **Noise only datasets**:
+* **Noise only datasets**
   - [noise_meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5](https://drive.google.com/file/d/1LpWtlNOvPFWWV_6lCJ2GMwjP0AyM1qt8/view?usp=sharing)
   - [noise_meas_MID00276_FID03659_gre_TE1.h5](https://drive.google.com/file/d/1EGSKo5qSrLfusbYnECRTG3Jqib-DcPMp/view?usp=sharing)
   - [noise_meas_MID00276_FID03660_gre_TE2.h5](https://drive.google.com/file/d/1hTlesOJvDV6R4aQduOP_1T9QdT-sKGcQ/view?usp=sharing)
