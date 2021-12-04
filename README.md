@@ -12,7 +12,7 @@ Nam Gyun Lee, University of Southern California, Dec 2021.
 # ISMRMD datasets
 
 * **Axial spiral spin-echo dataset**: 
-[**meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5**](https://drive.google.com/file/d/1M5bMNL2bWOsEqaKKpHBPQLHVSesq-Lx2/view?usp=sharing)
+[meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5](https://drive.google.com/file/d/1M5bMNL2bWOsEqaKKpHBPQLHVSesq-Lx2/view?usp=sharing)
 
 Sagittal spiral spin-echo dataset: 
 meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5
