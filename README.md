@@ -13,17 +13,13 @@ Nam Gyun Lee, University of Southern California, Dec 2021.
 
 * **Axial spiral spin-echo dataset**: [meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5](https://drive.google.com/file/d/1M5bMNL2bWOsEqaKKpHBPQLHVSesq-Lx2/view?usp=sharing)
 
-* **Axial GRE datasets**:
+* **Axial GRE datasets**
 
-  [meas_MID00276_FID03659_gre_TE1.h5](https://drive.google.com/file/d/1oNQJP_fau6dZoS5EXGtUk8yQ75Bkb7GV/view?usp=sharing)
-  
-  [meas_MID00277_FID03660_gre_TE2.h5](https://drive.google.com/file/d/1T5czOtlOezgHWib8Teoz1JBZE_bMtg4F/view?usp=sharing)
-  
-  [meas_MID00278_FID03661_gre_TE3.h5](https://drive.google.com/file/d/1zhbBxD9RJ0v4JIcsmbH6_Rv0NfkSDggb/view?usp=sharing)
-  
-  [meas_MID00279_FID03662_gre_TE4.h5](https://drive.google.com/file/d/1hE9suU9RN0c8LdPuwzgOt6N4M_0y9daV/view?usp=sharing)
-  
-  [meas_MID00280_FID03663_gre_TE5.h5](https://drive.google.com/file/d/1Stp4XnRI91sbJ2eBa6VLALIoKrKnKsfY/view?usp=sharing)
+  - [meas_MID00276_FID03659_gre_TE1.h5](https://drive.google.com/file/d/1oNQJP_fau6dZoS5EXGtUk8yQ75Bkb7GV/view?usp=sharing)  
+  - [meas_MID00277_FID03660_gre_TE2.h5](https://drive.google.com/file/d/1T5czOtlOezgHWib8Teoz1JBZE_bMtg4F/view?usp=sharing)
+  - [meas_MID00278_FID03661_gre_TE3.h5](https://drive.google.com/file/d/1zhbBxD9RJ0v4JIcsmbH6_Rv0NfkSDggb/view?usp=sharing) 
+  - [meas_MID00279_FID03662_gre_TE4.h5](https://drive.google.com/file/d/1hE9suU9RN0c8LdPuwzgOt6N4M_0y9daV/view?usp=sharing)
+  - [meas_MID00280_FID03663_gre_TE5.h5](https://drive.google.com/file/d/1Stp4XnRI91sbJ2eBa6VLALIoKrKnKsfY/view?usp=sharing)
 
 * **Axial Cartesian spin-echo dataset**: [meas_MID00273_FID03656_se_15b130_tra.h5](https://drive.google.com/file/d/1CCgAoHHitQ4UkIdaBVrXqA9qxW7YABlB/view?usp=sharing)
 
