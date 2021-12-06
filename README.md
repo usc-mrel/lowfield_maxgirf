@@ -2,7 +2,7 @@
 
 This repository contains the code and datasets for
 **"MaxGIRF: Image Reconstruction Incorporating Concomitant
-Field and Gradient Impulse Response Function Effects"**, by Nam G. Lee, Rajiv Ramasawmy, Yongwan Lim, Adrienne E. Campbell-Washburn&Dagger, and Krishna S. Nayak.
+Field and Gradient Impulse Response Function Effects"**, by Nam G. Lee, Rajiv Ramasawmy, Yongwan Lim, Adrienne E. Campbell-Washburn$\Dag$, and Krishna S. Nayak$\Dag$.
 
 This code is distributed under the BSD license.
 
