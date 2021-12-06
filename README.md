@@ -1,7 +1,6 @@
 # lowfield_maxgirf
 
 This repository contains the code and datasets for
-
 **"MaxGIRF: Image Reconstruction Incorporating Concomitant
 Field and Gradient Impulse Response Function Effects"**, by Nam G. Lee, Rajiv Ramasawmy, Yongwan Lim, Adrienne E. Campbell-Washburn, and Krishna S. Nayak.
 
