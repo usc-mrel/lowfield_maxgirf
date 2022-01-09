@@ -12,10 +12,10 @@ Nam Gyun Lee, University of Southern California, Dec 2021.
 Example human and phantom datasets can be found on Zenodo:
 
 - Human: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5830910.svg)](https://doi.org/10.5281/zenodo.5830910)
-- ISMMRM/NIST phantom:
+- Phantom:
 
 * **Axial Cartesian spin-echo dataset**
-  - [meas_MID00273_FID03656_se_15b130_tra.h5](https://drive.google.com/file/d/1CCgAoHHitQ4UkIdaBVrXqA9qxW7YABlB/view?usp=sharing)
+  - [meas_MID00273_FID03656_se_15b130_tra.h5]
 
 * **Axial spiral spin-echo dataset** 
   - [meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5](https://drive.google.com/file/d/1M5bMNL2bWOsEqaKKpHBPQLHVSesq-Lx2/view?usp=sharing)
