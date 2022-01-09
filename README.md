@@ -9,9 +9,10 @@ This code is distributed under the BSD license.
 Nam Gyun Lee, University of Southern California, Dec 2021.
 
 ## ISMRMRD datasets
-Example human axial and sagittal datasets can be found on Zenodo:
+Example human and phantom datasets can be found on Zenodo:
 
-10.5281/zenodo.5830910
+- Human: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5830910.svg)](https://doi.org/10.5281/zenodo.5830910)
+- ISMMRM/NIST phantom:
 
 * **Axial Cartesian spin-echo dataset**
   - [meas_MID00273_FID03656_se_15b130_tra.h5](https://drive.google.com/file/d/1CCgAoHHitQ4UkIdaBVrXqA9qxW7YABlB/view?usp=sharing)
