@@ -7,9 +7,14 @@
 close all; clear; clc;
 
 %% Set the directory names
-output_directory = 'D:\lowfield_maxgirf\figures7&8\20201102_NV_brain_se_spiral_1102_sag_s24_osf2_B0_correction1_concomitant_correction1_Lmax50_L30';
-data_directory = 'D:\lowfield\NHLBI\data\20201102_NV_brain';
-B0map_fullpath = 'D:\lowfield_maxgirf\B0map_nlinv_min1.0e-06_sagittal.mat';
+result_directory    = 'E:\lowfield_maxgirf\results_meas_MID00260_FID03643_se_spiral_1102_sag_s24';
+nufft_fullpath      = fullfile(result_directory, 'meas_MID00260_FID03643_se_spiral_1102_sag_s24_nufft_gpu.mat');
+king_fullpath       = fullfile(result_directory, 'meas_MID00260_FID03643_se_spiral_1102_sag_s24_king.mat');
+sense_fullpath      = fullfile(result_directory, 'meas_MID00260_FID03643_se_spiral_1102_sag_s24_sense_gpu.mat');
+maxgirf_cp_fullpath = fullfile(result_directory, 'meas_MID00260_FID03643_se_spiral_1102_sag_s24_cpr_gpu.mat');
+maxgirf_cg_fullpath = fullfile(result_directory, 'meas_MID00260_FID03643_se_spiral_1102_sag_s24_maxgirf_gpu_supp1_iter45');
+cartesian_fullpath  = fullfile('E:\lowfield_maxgirf', 'meas_MID00258_FID03641_se_15b130_ro0');
+B0map_fullpath      = 'B0map_nlinv_min1.0e-06_sagittal_ro0.mat';
 
 %% Define stuff
 slice_offsets = [-62.47249; 
@@ -25,29 +30,17 @@ slice_offsets = [-62.47249;
                   49.97799] * 1e-3; % [m]
 actual_slice_nrs = [1,3,5,7,9,11,2,4,6,8,10].';
 
-%% Load cartesian images
-load(fullfile(data_directory, 'd20201102_NV_brain'));
-im_cartesian_ = s12_se_15b130_sag.img; % sagittal
-[N1,N2,N3] = size(im_cartesian_);
-N1_zpad = 2 * N1;
-N2_zpad = 2 * N2;
-im_cartesian = zeros(N1_zpad, N2_zpad, N3, 'double');
-idx1_range = (-floor(N1/2):ceil(N1/2)-1).' + floor(N1_zpad/2) + 1;
-idx2_range = (-floor(N2/2):ceil(N2/2)-1).' + floor(N2_zpad/2) + 1;
-im_cartesian(idx1_range,idx2_range,:) = im_cartesian_;
-
 %% Load a B0 map
 load(B0map_fullpath);
-B0map = zeros(N1_zpad, N2_zpad, N3, 'double');
-B0map(idx1_range,idx2_range,:) = B0map_nlinv;
+B0map = B0map_nlinv;
 
 %% Define a function handle
-if ~isempty(strfind(output_directory, '_sag_'))
+if ~isempty(strfind(result_directory, '_sag_'))
     reorient = @(x) x;
     axis_text = 'x';
-elseif ~isempty(strfind(output_directory, '_cor_'))
+elseif ~isempty(strfind(result_directory, '_cor_'))
     reorient = @(x) x;
-elseif ~isempty(strfind(output_directory, '_ax_'))
+elseif ~isempty(strfind(result_directory, '_ax_'))
     reorient = @(x) flip(rot90(x, -1), 2);
     axis_text = 'z';
 end
@@ -57,38 +50,38 @@ vec = @(x) x(:);
 %% Load .mat files
 slice_nr = 11;
 slice_offset = slice_offsets(slice_nr); % [m]
-actual_slice_nr = actual_slice_nrs(slice_nr);
-L = 15;
-
-%--------------------------------------------------------------------------
-% Define .mat filenames
-%--------------------------------------------------------------------------
-nufft_filename           = sprintf('nufft_slice%d.mat', slice_nr);
-king_filename            = sprintf('king_slice%d.mat', slice_nr);
-maxgirf_lowrank_filename = sprintf('maxgirf_lowrank_slice%d.mat', slice_nr);
-kp_filename              = sprintf('kp_slice%d.mat', slice_nr);
 
 %--------------------------------------------------------------------------
 % Load .mat files
 %--------------------------------------------------------------------------
-load(fullfile(output_directory, nufft_filename));
-load(fullfile(output_directory, king_filename));
-load(fullfile(output_directory, maxgirf_lowrank_filename));
-load(fullfile(output_directory, kp_filename));
-[N1,N2] = size(im_nufft);
-
-im_cartesian       = reorient(im_cartesian);
-im_nufft           = reorient(im_nufft);
-im_king            = reorient(im_king);
-im_maxgirf_lowrank = reorient(im_maxgirf_lowrank);
-B0map              = reorient(B0map);
+load(nufft_fullpath);
+load(king_fullpath);
+load(maxgirf_cg_fullpath);
+load(fullfile(result_directory, 'meas_MID00260_FID03643_se_spiral_1102_sag_s24_maxgirf_kp'));
+load(cartesian_fullpath);
 
 %% Calculate time-averaged concomitant fields
+[N1,N2,Ns] = size(im_nufft_gpu);
+
+k = output_maxgirf(slice_nr).k;
+p = output_maxgirf(slice_nr).p;
+T = output_maxgirf(slice_nr).T;
 Nk = size(k,1);
-T = 2.5e-6 * Nk;
+
+%T = 2.5e-6 * Nk;
 fc1 = reshape(k(end,4:end,1) * p(:,4:end).', [N1 N2]) / (2 * pi * T);
 
+%% Zeropad in image-space
+im_cartesian       = zpad(reorient(im_se(:,:,slice_nr)), [640 640]);
+im_nufft           = zpad(reorient(im_nufft_gpu(:,:,slice_nr)), [640 640]);
+im_king            = zpad(reorient(im_king(:,:,slice_nr)), [640 640]);
+im_maxgirf_lowrank = zpad(reorient(im_maxgirf_gpu(:,:,slice_nr)), [640 640]);
+B0map              = zpad(reorient(B0map(:,:,slice_nr)), [640 640]);
+fc1                = zpad(fc1, [640 640]);
+
 %% Scale images
+N1 = 640;
+N2 = 640;
 c1 = floor(N1/2) + 1;
 c2 = floor(N2/2) + 1;
 
@@ -109,7 +102,7 @@ im4_max = max(abs(im4(:)));
 max_all = max(cat(1, im2_max, im3_max, im4_max));
 cmax = max_all * 0.7;
 
-im1 = im_cartesian(:,:,actual_slice_nr) / max(abs(vec(im_cartesian(:,:,actual_slice_nr)))) * max_all;
+im1 = im_cartesian / max(abs(im_cartesian(:))) * max_all;
 
 N1_zoom = 400;
 N2_zoom = 320;
@@ -278,7 +271,7 @@ annotation(gcf, 'arrow', [0.7430 0.7303]+0.008      , [0.5543 0.5434]+0.075-0.12
 % static off-resonance map
 %--------------------------------------------------------------------------
 ax7 = subplot(3,3,7);
-imagesc(B0map(idx1_range,idx2_range,actual_slice_nr)); axis image off;
+imagesc(B0map(idx1_range,idx2_range)); axis image off;
 caxis([-100 100]);
 colormap(gca, hot(256));
 text(N2_zoom/2, 0, {'Static off-resonance'}, 'Color', color_order(3,:), 'FontSize', 14, 'Rotation', 0, 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'center');
@@ -307,8 +300,8 @@ text(2, 0, {'(H)'}, 'Color', 'w', 'FontSize', 14, 'Rotation', 0, 'VerticalAlignm
 % static off-resonance map + average concomitant fields map
 %--------------------------------------------------------------------------
 ax9 = subplot(3,3,9); hold on;
-imagesc(B0map(idx1_range,idx2_range,actual_slice_nr) + fc1(idx1_range,idx2_range)); axis image ij off;
-contour(gca, B0map(idx1_range,idx2_range,actual_slice_nr) + fc1(idx1_range,idx2_range), cat(1, 0, (0:50:350).'), ...
+imagesc(B0map(idx1_range,idx2_range) + fc1(idx1_range,idx2_range)); axis image ij off;
+contour(gca, B0map(idx1_range,idx2_range) + fc1(idx1_range,idx2_range), cat(1, 0, (0:50:350).'), ...
     'ShowText' ,'on', 'LevelStep', 4, 'LineWidth', 1, 'Color', 'w');
 caxis([-50 400]);
 colormap(gca, jet(256));

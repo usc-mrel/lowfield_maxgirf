@@ -30,7 +30,6 @@ if field_T == 1.4940
 elseif field_T == 0.55
     % 0.55T Aera (NHLBI 2018)
     girf_file = 'GIRF_20200221_Duyn_method_coil2.mat';
-    %girf_file = 'GIRF_20201014_Brodsky_method_coil16.mat';
 end
 
 % === Load file ===
