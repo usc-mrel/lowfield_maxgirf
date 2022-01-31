@@ -91,10 +91,10 @@ Update variables in `demo_non_cartesian_recon_human_sagittal.m`.
 
     src_directory          = 'path-to-this-package';
     ismrmrd_directory      = 'path-to-ISMRMRD-package';
-    ismrmrd_noise_fullpath = 'D:\lowfield\NHLBI\data\20201102_NV_brain\noise\noise_meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5';
-    ismrmrd_data_fullpath  = 'D:\lowfield\NHLBI\data\20201102_NV_brain\h5\meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5';
-    siemens_dat_fullpath   = 'D:\lowfield\NHLBI\data\20201102_NV_brain\meas_MID00260_FID03643_se_spiral_1102_sag_s24.dat';
-    B0map_fullpath         = 'E:\lowfield_maxgirf\B0map_nlinv_min1.0e-06_sagittal_ro0.mat';
+    ismrmrd_noise_fullpath = 'path-to-dataset\noise_meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5';
+    ismrmrd_data_fullpath  = 'path-to-dataset\meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5';
+    siemens_dat_fullpath   = 'path-to-dataset\meas_MID00260_FID03643_se_spiral_1102_sag_s24.dat';
+    B0map_fullpath         = 'path-to-this-package\B0map_nlinv_min1.0e-06_sagittal_ro0.mat';
 
 Run `demo_non_cartesian_recon_human_sagittal.m`.
 
