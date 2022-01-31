@@ -12,7 +12,7 @@ Nam Gyun Lee, University of Southern California, Dec 2021.
 Example human and phantom datasets can be found on Zenodo:
 
 - Human: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5830910.svg)](https://doi.org/10.5281/zenodo.5830910)
-- Phantom:
+- Phantom: [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.5874604.svg)](https://doi.org/10.5281/zenodo.5874604)
 
 * **Axial Cartesian spin-echo dataset**
   - meas_MID00273_FID03656_se_15b130_tra.h5
@@ -56,19 +56,19 @@ Example human and phantom datasets can be found on Zenodo:
   - noise_meas_MID00261_FID03648_gre_TE5.h5
 
 * **Mat file containing reconstructed Cartesian spin-echo images**
-  - [d20201102_NV_brain.mat](https://drive.google.com/file/d/1yU42YylEXz8YH_UbEsBLQceD0ywTYFfb/view?usp=sharing)
+  - B0map_nlinv_min1.0e-06_axial.mat
+  - B0map_nlinv_min1.0e-06_sagittal_ro0.mat (ro := remove oversampling: 1=yes, 0=no)
+  - B0map_nlinv_min1.0e-06_sagittal_ro1.mat
 
 Once datasets are downloaded, organize datasets in this structure:
  
      |---path-to-dataset (e.g., D:\lowfield\NHLBI\data\20201102_NV_brain)
-         |---d20201102_NV_brain.mat
-         |---h5
-             |---meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5
-             |---meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5
-         |---noise
-             |---noise_meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5
-             |---noise_meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5
- 
+         |---meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5
+         |---meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5
+         |---noise_meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5
+         |---noise_meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5
+         |---B0map_nlinv_min1.0e-06_sagittal_ro0.mat
+         |---B0map_nlinv_min1.0e-06_sagittal_ro1.mat
 
 ## Figure 3 (numerical simulation)
 
@@ -83,32 +83,19 @@ Run `figure3\demo_generate_figure3.m`
  
 ## Figures 5 and 6 (human axial spiral spin-echo imaging)
 
-Update variables `src_directory` and `ismrmrd_directory` in `demo_maxgirf_spiral_se_human.m`.
-
-    src_directory = 'path-to-this-package';
-    ismrmrd_directory = 'path-to-ISMRMRD-package';
-
-Update variables `B0map_fullpath` and `data_directory` in `demo_batch_maxgirf_spiral_se_human_axial.m`.
-
-    B0map_fullpath = 'path-to-this-package\B0map_nlinv_min1.0e-06_axial.mat';
-    data_directory = 'path-to-dataset';
-
-Run `demo_batch_maxgirf_spiral_se_human_axial.m`.
-
-Run `figures5&6\demo_generate_figure5.m` and `figures5&6\demo_generate_figure6.m` to generate Figures 5 and 6, respectively.
+TBD
 
 ## Figures 7 and 8 (human sagittal spiral spin-echo imaging)
 
-Update variables `src_directory` and `ismrmrd_directory` in `demo_maxgirf_spiral_se_human.m`.
+Update variables in `demo_non_cartesian_recon_human_sagittal.m`.
 
-    src_directory = 'path-to-this-package';
-    ismrmrd_directory = 'path-to-ISMRMRD-package';
+    src_directory          = 'path-to-this-package';
+    ismrmrd_directory      = 'path-to-ISMRMRD-package';
+    ismrmrd_noise_fullpath = 'D:\lowfield\NHLBI\data\20201102_NV_brain\noise\noise_meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5';
+    ismrmrd_data_fullpath  = 'D:\lowfield\NHLBI\data\20201102_NV_brain\h5\meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5';
+    siemens_dat_fullpath   = 'D:\lowfield\NHLBI\data\20201102_NV_brain\meas_MID00260_FID03643_se_spiral_1102_sag_s24.dat';
+    B0map_fullpath         = 'E:\lowfield_maxgirf\B0map_nlinv_min1.0e-06_sagittal_ro0.mat';
 
-Update variables `B0map_fullpath` and `data_directory` in `demo_batch_maxgirf_spiral_se_human_sagittal.m`.
-
-    B0map_fullpath = 'path-to-this-package\B0map_nlinv_min1.0e-06_sagittal.mat';
-    data_directory = 'path-to-dataset';
-
-Run `demo_batch_maxgirf_spiral_se_human_sagittal.m`.
+Run `demo_non_cartesian_recon_human_sagittal.m`.
 
 Run `figures7&8\demo_generate_figure7.m` and `figures7&8\demo_generate_figure8.m` to generate Figures 7 and 8, respectively.
