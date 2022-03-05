@@ -54,7 +54,7 @@ Example human and phantom datasets can be found on Zenodo:
   - noise_meas_MID00261_FID03647_gre_TE4.h5
   - noise_meas_MID00261_FID03648_gre_TE5.h5
 
-* **Mat file containing a static off-resonance map using [NLINV estimation](https://github.com/usc-mrel/nlinv_estimation)**
+* **Mat files containing a static off-resonance map obtained with [NLINV estimation](https://github.com/usc-mrel/nlinv_estimation)**
   - B0map_nlinv_min1.0e-06_axial.mat
   - B0map_nlinv_min1.0e-06_sagittal_ro0.mat (ro := remove oversampling: 1=yes, 0=no)
   - B0map_nlinv_min1.0e-06_sagittal_ro1.mat
