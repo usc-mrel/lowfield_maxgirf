@@ -1,8 +1,7 @@
 # lowfield_maxgirf
 
 This repository contains the code and datasets for
-**"MaxGIRF: Image Reconstruction Incorporating Concomitant
-Field and Gradient Impulse Response Function Effects"**, by Nam G. Lee, Rajiv Ramasawmy, Yongwan Lim, Adrienne E. Campbell-Washburn, and Krishna S. Nayak.
+**"MaxGIRF: Image Reconstruction Incorporating Concomitant Field and Gradient Impulse Response Function Effects"**, by Nam G. Lee, Rajiv Ramasawmy, Yongwan Lim, Adrienne E. Campbell-Washburn, and Krishna S. Nayak.
 
 This code is distributed under the BSD license.
 
@@ -67,6 +66,7 @@ Once datasets are downloaded, organize datasets in this structure:
          |---meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5
          |---noise_meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5
          |---noise_meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5
+		 |---B0map_nlinv_min1.0e-06_axial.mat
          |---B0map_nlinv_min1.0e-06_sagittal_ro0.mat
          |---B0map_nlinv_min1.0e-06_sagittal_ro1.mat
 
@@ -79,11 +79,20 @@ Update variables `src_directory` and `mida_directory` in `figure3\demo_2d_spiral
  
 Run `figure3\demo_batch_2d_spiral_simulation.m`
 
-Run `figure3\demo_generate_figure3.m`
+Run `figure3\demo_generate_figure3.m` to generate Figure 3.
  
 ## Figures 5 and 6 (human axial spiral spin-echo imaging)
 
-TBD
+Update variables in `demo_non_cartesian_recon_human_axial.m`.
+
+    src_directory          = 'path-to-this-package';
+    ismrmrd_directory      = 'path-to-ISMRMRD-package';
+    ismrmrd_noise_fullpath = 'path-to-dataset\noise_meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5';
+    ismrmrd_data_fullpath  = 'path-to-dataset\meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5';
+    siemens_dat_fullpath   = 'path-to-dataset\meas_MID00275_FID03658_se_spiral_1102_ax_s24.dat';
+    B0map_fullpath         = 'path-to-dataset\B0map_nlinv_min1.0e-06_axial.mat';
+
+Run `demo_non_cartesian_recon_human_axial.m`.
 
 ## Figures 7 and 8 (human sagittal spiral spin-echo imaging)
 
@@ -94,7 +103,7 @@ Update variables in `demo_non_cartesian_recon_human_sagittal.m`.
     ismrmrd_noise_fullpath = 'path-to-dataset\noise_meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5';
     ismrmrd_data_fullpath  = 'path-to-dataset\meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5';
     siemens_dat_fullpath   = 'path-to-dataset\meas_MID00260_FID03643_se_spiral_1102_sag_s24.dat';
-    B0map_fullpath         = 'path-to-this-package\B0map_nlinv_min1.0e-06_sagittal_ro0.mat';
+    B0map_fullpath         = 'path-to-dataset\B0map_nlinv_min1.0e-06_sagittal_ro0.mat';
 
 Run `demo_non_cartesian_recon_human_sagittal.m`.
 

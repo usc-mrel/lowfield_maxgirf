@@ -97,9 +97,11 @@ save(sprintf('%s_sense_gpu', output_filename), 'im_sense_gpu', 'header_sense', '
 [im_cpr_gpu,header_cpr,r_dcs_cpr,output_cpr] = siemens_maxgirf_cp_recon_gpu(ismrmrd_noise_fullpath, ismrmrd_data_fullpath, siemens_dat_fullpath, B0map_nlinv, user_opts);
 save(sprintf('%s_cpr_gpu', output_filename), 'im_cpr_gpu', 'header_cpr', 'r_dcs_cpr', 'output_cpr', 'user_opts', '-v7.3');
 
+if 0
 %% Perform CG-based MaxGIRF reconstruction (single-GPU)
-%[im_maxgirf_gpu,header_maxgirf,r_dcs_maxgirf,output_maxgirf] = siemens_maxgirf_cg_recon_single_gpu(ismrmrd_noise_fullpath, ismrmrd_data_fullpath, siemens_dat_fullpath, B0map_nlinv, user_opts);
-%save(sprintf('%s_maxgirf_multi_gpu_supp%d_iter%d', output_filename, user_opts.support_constraint, user_opts.max_iterations), 'im_maxgirf_gpu', 'header_maxgirf', 'r_dcs_maxgirf', 'output_maxgirf', 'user_opts', '-v7.3');
+[im_maxgirf_gpu,header_maxgirf,r_dcs_maxgirf,output_maxgirf] = siemens_maxgirf_cg_recon_single_gpu(ismrmrd_noise_fullpath, ismrmrd_data_fullpath, siemens_dat_fullpath, B0map_nlinv, user_opts);
+save(sprintf('%s_maxgirf_multi_gpu_supp%d_iter%d', output_filename, user_opts.support_constraint, user_opts.max_iterations), 'im_maxgirf_gpu', 'header_maxgirf', 'r_dcs_maxgirf', 'output_maxgirf', 'user_opts', '-v7.3');
+end
 
 %% Perform CG-based MaxGIRF reconstruction (multi-GPU)
 [im_maxgirf_gpu,header_maxgirf,r_dcs_maxgirf,output_maxgirf] = siemens_maxgirf_cg_recon_multi_gpu(ismrmrd_noise_fullpath, ismrmrd_data_fullpath, siemens_dat_fullpath, B0map_nlinv, user_opts);

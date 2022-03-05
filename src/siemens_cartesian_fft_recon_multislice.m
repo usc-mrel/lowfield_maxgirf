@@ -1,7 +1,7 @@
-function [im,header,r_dcs] = siemens_cartesian_fft_recon_multislice(ismrmrd_noise_fullpath, ismrmrd_data_fullpath, siemens_dat_fullpath, user_opts)
+function [im_multislice,header,r_dcs_multislice] = siemens_cartesian_fft_recon_multislice(ismrmrd_noise_fullpath, ismrmrd_data_fullpath, siemens_dat_fullpath, user_opts)
 % Written by Nam Gyun Lee
 % Email: namgyunl@usc.edu, ggang56@gmail.com (preferred)
-% Started: 01/16/2022, Last modified: 01/16/2022
+% Started: 01/16/2022, Last modified: 02/05/2022
 
 %% Read k-space data (ISMRMRD format)
 start_time = tic;
@@ -169,8 +169,8 @@ fprintf('nr_phases          = %d\n', nr_phases);
 fprintf('nr_repetitions     = %d\n', nr_repetitions);
 fprintf('nr_sets            = %d\n', nr_sets);
 fprintf('nr_segments        = %d\n', nr_segments);
-fprintf('dt                 = %g [usec]\n', dt * 1e6);
-fprintf('readout duration   = %g [msec]\n', T * 1e3);
+fprintf('dt                 = %5.2f [usec]\n', dt * 1e6);
+fprintf('readout duration   = %5.2f [msec]\n', T * 1e3);
 fprintf('=================================================================\n');
 
 %% Calculate the receiver noise matrix
@@ -187,8 +187,8 @@ end
 
 %% Perform FFT reconstruction per slice
 nr_recons = nr_slices * nr_contrasts * nr_phases * nr_repetitions * nr_sets;
-im = complex(zeros(N1, N2, nr_slices, 'double'));
-r_dcs = zeros(N, 3, nr_slices, 'double');
+im_multislice = complex(zeros(N1, N2, nr_slices, 'double'));
+r_dcs_multislice = zeros(N, 3, nr_slices, 'double');
 
 for idx = 1:nr_recons
     %% Get information about the current slice
@@ -293,14 +293,10 @@ for idx = 1:nr_recons
             tra_offset_twix = 0; % [mm]
         end
         pcs_offset_twix = [sag_offset_twix; cor_offset_twix; tra_offset_twix] * 1e-3; % [mm] * [m/1e3mm] => [m]
-    else
-        sag_offset_twix = NaN;
-        cor_offset_twix = NaN;
-        tra_offset_twix = NaN;
     end
 
-    %% Use a slice offset in PCS from ISMRMRD format
-    pcs_offset = [sag_offset_ismrmrd; cor_offset_ismrmrd; tra_offset_ismrmrd] * 1e-3; % [mm] * [m/1e3mm] => [m]
+    %% Use a slice offset in PCS from Siemens TWIX format
+    pcs_offset = [sag_offset_twix; cor_offset_twix; tra_offset_twix] * 1e-3; % [mm] * [m/1e3mm] => [m]
 
     %% Calculate spatial coordinates in DCS [m]
     %----------------------------------------------------------------------
@@ -355,10 +351,12 @@ for idx = 1:nr_recons
     %----------------------------------------------------------------------
     % Calculate spatial coordinates in DCS [m]
     %----------------------------------------------------------------------
-    r_dcs(:,:,idx) = (repmat(dcs_offset, [1 N]) + R_pcs2dcs * R_gcs2pcs * r_gcs.').'; % N x 3
+    r_dcs = (repmat(dcs_offset, [1 N]) + R_pcs2dcs * R_gcs2pcs * r_gcs.').'; % N x 3
+    r_dcs_multislice(:,:,idx) = r_dcs;
 
     %% Display slice information
     fprintf('======================= SLICE INFORMATION ========================\n');
+    fprintf('slice_nr = %d, actual_slice_nr = %d\n', slice_nr, actual_slice_nr);
     fprintf('phase_sign = %+g, read_sign = %+g\n', phase_sign, read_sign);
     fprintf('---------------------- From Siemens TWIX format ------------------\n');
     fprintf('                   [sag]   %10.5f [mm]\n', sag_offset_twix);
@@ -426,7 +424,7 @@ for idx = 1:nr_recons
 
     kspace = complex(zeros(Nkx, Nky, Nkz, Nc, 'double'));
     for idx1 = 1:length(profile_list)
-        tstart = tic; fprintf('Reading k-space data (%d/%d)... ', idx1, length(profile_list));
+        tstart = tic; fprintf('(%2d/%2d): Reading k-space data (%d/%d)... ', idx, nr_recons, idx1, length(profile_list));
         %------------------------------------------------------------------
         % Calculate the (2nd,3rd) matrix index of a profile
         %------------------------------------------------------------------
@@ -455,7 +453,7 @@ for idx = 1:nr_recons
     end
 
     %% Flip k-space
-    tstart = tic; fprintf('Flipping k-space... ');
+    tstart = tic; fprintf('(%2d/%2d): Flipping k-space... ', idx, nr_recons);
     if read_sign == -1
         kspace = flip(kspace,1);
     end
@@ -468,7 +466,7 @@ for idx = 1:nr_recons
     %----------------------------------------------------------------------
     % FFT along the readout direction (k-space <=> image-space)
     %----------------------------------------------------------------------
-    tstart = tic; fprintf('Removing readout oversampling... ');
+    tstart = tic; fprintf('(%2d/%2d): Removing readout oversampling... ', idx, nr_recons);
     projection = 1 / sqrt(Nkx) * fftshift(fft(ifftshift(kspace, 1), [], 1), 1);
     idx1_range = (-floor(Nk/2):ceil(Nk/2)-1).' + floor(Nkx/2) + 1;
     kspace = sqrt(Nk / osf) * fftshift(ifft(ifftshift(projection(idx1_range,:,:,:), 1), [], 1), 1);
@@ -499,6 +497,6 @@ for idx = 1:nr_recons
     for dim = 1:2
         imc = 1 / sqrt(size(imc,dim)) * fftshift(fft(ifftshift(imc, dim), [], dim), dim);
     end
-    im(:,:,idx) = sum(bsxfun(@times, conj(csm), imc), 3);
+    im_multislice(:,:,idx) = sum(bsxfun(@times, conj(csm), imc), 3);
 end
 end

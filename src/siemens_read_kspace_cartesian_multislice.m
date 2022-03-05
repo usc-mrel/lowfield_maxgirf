@@ -299,8 +299,8 @@ for idx = 1:nr_recons
         tra_offset_twix = NaN;
     end
 
-    %% Use a slice offset in PCS from ISMRMRD format
-    pcs_offset = [sag_offset_ismrmrd; cor_offset_ismrmrd; tra_offset_ismrmrd] * 1e-3; % [mm] * [m/1e3mm] => [m]
+    %% Use a slice offset in PCS from Siemens TWIX format
+    pcs_offset = [sag_offset_twix; cor_offset_twix; tra_offset_twix] * 1e-3; % [mm] * [m/1e3mm] => [m]
 
     %% Calculate spatial coordinates in DCS [m]
     %----------------------------------------------------------------------

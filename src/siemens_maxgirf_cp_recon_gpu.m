@@ -62,11 +62,11 @@ if strcmp(header.encoding.trajectory, 'spiral')
     fov_coefficients  = header.encoding.trajectoryDescription.userParameterLong(2).value;        % fov_coefficients
     sampling_time     = header.encoding.trajectoryDescription.userParameterLong(3).value * 1e-9; % SamplingTime_ns [sec]
     fprintf('==================== Trajectory description =====================\n');
-    fprintf('Gmax          = %5.3f [G/cm]\n' , Gmax);
-    fprintf('Smax          = %d [G/cm/sec]\n', Smax);
-    fprintf('FOV           = %4.2f [cm]\n'   , FOV);
-    fprintf('interleaves   = %d\n'           , interleaves);
-    fprintf('sampling_time = %g [sec]\n'     , sampling_time);
+    fprintf('Gmax          = %5.3f [G/cm]\n'    , Gmax);
+    fprintf('Smax          = %5.3f [G/cm/sec]\n', Smax);
+    fprintf('FOV           = %5.2f [cm]\n'      , FOV);
+    fprintf('interleaves   = %d\n'              , interleaves);
+    fprintf('sampling_time = %5.3f [sec]\n'     , sampling_time);
     fprintf('=================================================================\n');
 end
 
@@ -170,8 +170,8 @@ fprintf('nr_phases          = %d\n', nr_phases);
 fprintf('nr_repetitions     = %d\n', nr_repetitions);
 fprintf('nr_sets            = %d\n', nr_sets);
 fprintf('nr_segments        = %d\n', nr_segments);
-fprintf('dt                 = %g [usec]\n', dt * 1e6);
-fprintf('readout duration   = %g [msec]\n', T * 1e3);
+fprintf('dt                 = %5.2f [usec]\n', dt * 1e6);
+fprintf('readout duration   = %5.2f [msec]\n', T * 1e3);
 fprintf('=================================================================\n');
 
 %% Define parameters for reconstruction
@@ -540,11 +540,10 @@ for idx = 1:nr_recons
             cor_offset_twix = 0; % [mm]
             tra_offset_twix = 0; % [mm]
         end
-        pcs_offset_twix = [sag_offset_twix; cor_offset_twix; tra_offset_twix] * 1e-3; % [mm] * [m/1e3mm] => [m]
     end
 
-    %% Use a slice offset in PCS from ISMRMRD format
-    pcs_offset = [sag_offset_ismrmrd; cor_offset_ismrmrd; tra_offset_ismrmrd] * 1e-3; % [mm] * [m/1e3mm] => [m]
+    %% Use a slice offset in PCS from Siemens TWIX format
+    pcs_offset = [sag_offset_twix; cor_offset_twix; tra_offset_twix] * 1e-3; % [mm] * [m/1e3mm] => [m]
 
     %% Calculate spatial coordinates in DCS [m]
     %----------------------------------------------------------------------
