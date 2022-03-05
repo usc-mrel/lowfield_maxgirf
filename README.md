@@ -94,6 +94,8 @@ Update variables in `demo_non_cartesian_recon_human_axial.m`.
 
 Run `demo_non_cartesian_recon_human_axial.m`.
 
+Run `demo_cartesian_recon_SE_axial.m`.
+
 ## Figures 7 and 8 (human sagittal spiral spin-echo imaging)
 
 Update variables in `demo_non_cartesian_recon_human_sagittal.m`.
@@ -106,5 +108,7 @@ Update variables in `demo_non_cartesian_recon_human_sagittal.m`.
     B0map_fullpath         = 'path-to-dataset\B0map_nlinv_min1.0e-06_sagittal_ro0.mat';
 
 Run `demo_non_cartesian_recon_human_sagittal.m`.
+
+Run `demo_cartesian_recon_SE_sagittal.m`.
 
 Run `figures7&8\demo_generate_figure7.m` and `figures7&8\demo_generate_figure8.m` to generate Figures 7 and 8, respectively.
