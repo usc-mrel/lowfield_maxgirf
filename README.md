@@ -3,8 +3,6 @@
 This repository contains the code and datasets for
 **"MaxGIRF: Image Reconstruction Incorporating Concomitant Field and Gradient Impulse Response Function Effects"**, by Nam G. Lee, Rajiv Ramasawmy, Yongwan Lim, Adrienne E. Campbell-Washburn, and Krishna S. Nayak.
 
-This code is distributed under the BSD license.
-
 Nam Gyun Lee, University of Southern California, Dec 2021.
 
 ## ISMRMRD datasets
