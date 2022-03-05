@@ -66,7 +66,7 @@ Once datasets are downloaded, organize datasets in this structure:
          |---meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5
          |---noise_meas_MID00260_FID03643_se_spiral_1102_sag_s24.h5
          |---noise_meas_MID00275_FID03658_se_spiral_1102_ax_s24.h5
-		 |---B0map_nlinv_min1.0e-06_axial.mat
+         |---B0map_nlinv_min1.0e-06_axial.mat
          |---B0map_nlinv_min1.0e-06_sagittal_ro0.mat
          |---B0map_nlinv_min1.0e-06_sagittal_ro1.mat
 
