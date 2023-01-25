@@ -799,7 +799,7 @@ for idx = 1:nr_recons
         s_device = zeros(L, nr_interleaves, 'double', 'gpuArray');
         for i = 1:length(interleaf_range)
             tstart = tic; fprintf('(%2d/%2d): Calculating randomized SVD (i=%2d/%2d)... ', idx, nr_recons, interleaf_range(i), Ni);
-            [U_,S_,V_] = calculate_rsvd_higher_order_encoding_matrix_gpu(k_device(:,4:end,i), p_device(:,4:end), Lmax, os, reshape(B0map_device(:,:,idx), [N 1]), t_device, static_B0_correction);
+            [U_,S_,V_] = calculate_rsvd_higher_order_encoding_matrix_gpu(k_device(:,4:end,i), p_device(:,4:end), Lmax, os, reshape(B0map_device(:,:,actual_slice_nr), [N 1]), t_device, static_B0_correction);
             U_device(:,:,i) = U_(:,1:L); % U: Nk x Lmax+os => Nk x L
             V_device(:,:,i) = V_(:,1:L) * S_(1:L,1:L)'; % V: N x Lmax+os => N x L
             s_device(:,i) = diag(S_(1:L,1:L));

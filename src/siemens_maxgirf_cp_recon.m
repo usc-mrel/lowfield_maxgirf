@@ -647,7 +647,7 @@ for idx = 1:nr_recons
     s = zeros(Lmax, Ni, 'double');
     for i = 1:Ni
         tstart = tic; fprintf('(%2d/%2d): Calculating randomized SVD (i=%2d/%2d)... ', idx, nr_recons, i, Ni);
-        [U_,S_,V_] = calculate_rsvd_higher_order_encoding_matrix(k(:,4:end,i), p(:,4:end), Lmax, os, reshape(B0map(:,:,idx), [N 1]), t, static_B0_correction);
+        [U_,S_,V_] = calculate_rsvd_higher_order_encoding_matrix(k(:,4:end,i), p(:,4:end), Lmax, os, reshape(B0map(:,:,actual_slice_nr), [N 1]), t, static_B0_correction);
         U(:,:,i) = U_(:,1:Lmax); % U: Nk x Lmax+os => Nk x Lmax
         V(:,:,i) = V_(:,1:Lmax) * S_(1:Lmax,1:Lmax)'; % V: N x Lmax+os => N x Lmax
         s(:,i) = diag(S_(1:Lmax,1:Lmax));

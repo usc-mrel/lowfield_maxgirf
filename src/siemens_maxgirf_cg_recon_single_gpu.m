@@ -1,4 +1,4 @@
-function [im_maxgirf_multislice,header,r_dcs_multislice,output] = siemens_maxgirf_cg_recon_single_gpu(ismrmrd_noise_fullpath, ismrmrd_data_fullpath, siemens_dat_fullpath, B0map, user_opts)
+function [im_maxgirf_multislice, header, r_dcs_multislice, output] = siemens_maxgirf_cg_recon_single_gpu(ismrmrd_noise_path, ismrmrd_data_path, siemens_dat_path, B0map, user_opts)
 % Written by Nam Gyun Lee
 % Email: namgyunl@usc.edu, ggang56@gmail.com (preferred)
 % Started: 01/16/2022, Last modified: 01/16/2022
@@ -8,12 +8,12 @@ gamma = 4257.59 * (1e4 * 2 * pi); % gyromagnetic ratio for 1H [rad/sec/T]
 
 %% Read k-space data (ISMRMRD format)
 start_time = tic;
-tstart = tic; fprintf('Reading an ISMRMRD file: %s... ', ismrmrd_data_fullpath);
-if exist(ismrmrd_data_fullpath, 'file')
-    dset = ismrmrd.Dataset(ismrmrd_data_fullpath, 'dataset');
+tstart = tic; fprintf('Reading an ISMRMRD file: %s... ', ismrmrd_data_path);
+if exist(ismrmrd_data_path, 'file')
+    dset = ismrmrd.Dataset(ismrmrd_data_path, 'dataset');
     fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
 else
-    error('File %s does not exist.  Please generate it.' , ismrmrd_data_fullpath);
+    error('File %s does not exist.  Please generate it.' , ismrmrd_data_path);
 end
 
 %% Get imaging parameters from the XML header
@@ -280,16 +280,16 @@ if isempty(B0map)
 end
 
 %% Read a Siemens .dat file
-if exist(siemens_dat_fullpath, 'file')
-    fprintf('Reading a Siemens .dat file: %s\n', siemens_dat_fullpath);
-    twix = mapVBVD(siemens_dat_fullpath);
+if exist(siemens_dat_path, 'file')
+    fprintf('Reading a Siemens .dat file: %s\n', siemens_dat_path);
+    twix = mapVBVD(siemens_dat_path);
     if length(twix) > 1
         twix = twix{end};
     end
 end
 
 %% Get a slice normal vector from Siemens TWIX format
-if exist(siemens_dat_fullpath, 'file')
+if exist(siemens_dat_path, 'file')
     %----------------------------------------------------------------------
     % dNormalSag: Sagittal component of a slice normal vector (in PCS)
     %----------------------------------------------------------------------
@@ -342,7 +342,7 @@ slice_dir = double(raw_data.head.slice_dir(:,1));
 R_gcs2pcs_ismrmrd = [phase_dir read_dir slice_dir];
 
 %% Calculate a rotation matrix from GCS to PCS
-if exist(siemens_dat_fullpath, 'file')
+if exist(siemens_dat_path, 'file')
     [R_gcs2pcs,phase_sign,read_sign] = siemens_calculate_matrix_gcs_to_pcs(dNormalSag, dNormalCor, dNormalTra, dRotAngle);
 else
     phase_sign = user_opts.phase_sign;
@@ -497,7 +497,7 @@ for i = 1:Ni
 end
 
 %% Calculate the receiver noise matrix
-[Psi,inv_L] = calculate_noise_decorrelation_matrix(ismrmrd_noise_fullpath);
+[Psi,inv_L] = calculate_noise_decorrelation_matrix(ismrmrd_noise_path);
 
 %% Perform NUFFT reconstruction per slice
 nr_recons = nr_slices * nr_contrasts * nr_phases * nr_repetitions * nr_sets * nr_segments;
@@ -542,7 +542,7 @@ for idx = 1:nr_recons
     tra_offset_ismrmrd = double(raw_data.head.position(3,slice_nr)); % [mm]
 
     %% Get a slice offset in PCS from Siemens TWIX format
-    if exist(siemens_dat_fullpath, 'file')
+    if exist(siemens_dat_path, 'file')
         if isfield(twix.hdr.MeasYaps.sSliceArray.asSlice{actual_slice_nr}, 'sPosition')
             if isfield(twix.hdr.MeasYaps.sSliceArray.asSlice{actual_slice_nr}.sPosition, 'dSag')
                 sag_offset_twix = twix.hdr.MeasYaps.sSliceArray.asSlice{actual_slice_nr}.sPosition.dSag; % [mm]
@@ -696,7 +696,6 @@ for idx = 1:nr_recons
     fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
 
     %% Transfer arrays from the CPU to the GPU
-    kspace_device = gpuArray(kspace);
     csm_device = gpuArray(csm);
     p_device = gpuArray(p);
 
@@ -707,7 +706,7 @@ for idx = 1:nr_recons
     s_device = zeros(Lmax, Ni, 'double', 'gpuArray');
     for i = 1:Ni
         tstart = tic; fprintf('(%2d/%2d): Calculating randomized SVD (i=%2d/%2d)... ', idx, nr_recons, i, Ni);
-        [U_,S_,V_] = calculate_rsvd_higher_order_encoding_matrix_gpu(k_device(:,4:end,i), p_device(:,4:end), Lmax, os, reshape(B0map_device(:,:,idx), [N 1]), t_device, static_B0_correction);
+        [U_,S_,V_] = calculate_rsvd_higher_order_encoding_matrix_gpu(k_device(:,4:end,i), p_device(:,4:end), Lmax, os, reshape(B0map_device(:,:,actual_slice_nr), [N 1]), t_device, static_B0_correction);
         U_device(:,:,i) = U_(:,1:Lmax); % U: Nk x Lmax+os => Nk x Lmax
         V_device(:,:,i) = V_(:,1:Lmax) * S_(1:Lmax,1:Lmax)'; % V: N x Lmax+os => N x Lmax
         s_device(:,i) = diag(S_(1:Lmax,1:Lmax));
@@ -725,7 +724,7 @@ for idx = 1:nr_recons
             %--------------------------------------------------------------
             % Caclulate d_{i,c}
             %--------------------------------------------------------------
-            d = kspace_device(:,i,c); % kspace: Nk x Ni x Nc
+            d = gpuArray(kspace(:,i,c)); % kspace: Nk x Ni x Nc
 
             %--------------------------------------------------------------
             % Calculate sum_{ell=1}^L ...
