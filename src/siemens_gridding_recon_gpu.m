@@ -1,4 +1,4 @@
-function [im_nufft_multislice,header,r_dcs_multislice] = siemens_gridding_recon_gpu(ismrmrd_noise_fullpath, ismrmrd_data_fullpath, siemens_dat_fullpath, user_opts)
+function [im_nufft_multislice, header, r_dcs_multislice] = siemens_gridding_recon_gpu(ismrmrd_noise_path, ismrmrd_data_path, siemens_dat_path, user_opts)
 % Written by Nam Gyun Lee
 % Email: namgyunl@usc.edu, ggang56@gmail.com (preferred)
 % Started: 01/16/2022, Last modified: 01/30/2022
@@ -8,12 +8,12 @@ gamma = 4257.59 * (1e4 * 2 * pi); % gyromagnetic ratio for 1H [rad/sec/T]
 
 %% Read k-space data (ISMRMRD format)
 start_time = tic;
-tstart = tic; fprintf('Reading an ISMRMRD file: %s... ', ismrmrd_data_fullpath);
-if exist(ismrmrd_data_fullpath, 'file')
-    dset = ismrmrd.Dataset(ismrmrd_data_fullpath, 'dataset');
+tstart = tic; fprintf('Reading an ISMRMRD file: %s... ', ismrmrd_data_path);
+if exist(ismrmrd_data_path, 'file')
+    dset = ismrmrd.Dataset(ismrmrd_data_path, 'dataset');
     fprintf('done! (%6.4f/%6.4f sec)\n', toc(tstart), toc(start_time));
 else
-    error('File %s does not exist.  Please generate it.' , ismrmrd_data_fullpath);
+    error('File %s does not exist.  Please generate it.' , ismrmrd_data_path);
 end
 
 %% Get imaging parameters from the XML header
@@ -214,16 +214,16 @@ end
 Nc = length(selected_channels); % number of coils
 
 %% Read a Siemens .dat file
-if exist(siemens_dat_fullpath, 'file')
-    fprintf('Reading a Siemens .dat file: %s\n', siemens_dat_fullpath);
-    twix = mapVBVD(siemens_dat_fullpath);
+if exist(siemens_dat_path, 'file')
+    fprintf('Reading a Siemens .dat file: %s\n', siemens_dat_path);
+    twix = mapVBVD(siemens_dat_path);
     if length(twix) > 1
         twix = twix{end};
     end
 end
 
 %% Get a slice normal vector from Siemens TWIX format
-if exist(siemens_dat_fullpath, 'file')
+if exist(siemens_dat_path, 'file')
     %----------------------------------------------------------------------
     % dNormalSag: Sagittal component of a slice normal vector (in PCS)
     %----------------------------------------------------------------------
@@ -276,7 +276,7 @@ slice_dir = double(raw_data.head.slice_dir(:,1));
 R_gcs2pcs_ismrmrd = [phase_dir read_dir slice_dir];
 
 %% Calculate a rotation matrix from GCS to PCS
-if exist(siemens_dat_fullpath, 'file')
+if exist(siemens_dat_path, 'file')
     [R_gcs2pcs,phase_sign,read_sign] = siemens_calculate_matrix_gcs_to_pcs(dNormalSag, dNormalCor, dNormalTra, dRotAngle);
 else
     phase_sign = user_opts.phase_sign;
@@ -403,7 +403,7 @@ nufft_st_device.p       = gpuArray(nufft_st.p);
 w_device = gpuArray(w);
 
 %% Calculate the receiver noise matrix
-[Psi,inv_L] = calculate_noise_decorrelation_matrix(ismrmrd_noise_fullpath);
+[Psi,inv_L] = calculate_noise_decorrelation_matrix(ismrmrd_noise_path);
 
 %% Perform NUFFT reconstruction per slice
 nr_recons = nr_slices * nr_contrasts * nr_phases * nr_repetitions * nr_sets * nr_segments;
@@ -447,7 +447,7 @@ for idx = 1:nr_recons
     tra_offset_ismrmrd = double(raw_data.head.position(3,slice_nr)); % [mm]
 
     %% Get a slice offset in PCS from Siemens TWIX format
-    if exist(siemens_dat_fullpath, 'file')
+    if exist(siemens_dat_path, 'file')
         if isfield(twix.hdr.MeasYaps.sSliceArray.asSlice{actual_slice_nr}, 'sPosition')
             if isfield(twix.hdr.MeasYaps.sSliceArray.asSlice{actual_slice_nr}.sPosition, 'dSag')
                 sag_offset_twix = twix.hdr.MeasYaps.sSliceArray.asSlice{actual_slice_nr}.sPosition.dSag; % [mm]

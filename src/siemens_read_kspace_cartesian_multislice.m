@@ -1,16 +1,16 @@
-function [kspace_multislice,header,r_dcs] = siemens_read_kspace_cartesian_multislice(ismrmrd_noise_fullpath, ismrmrd_data_fullpath, siemens_dat_fullpath, user_opts)
+function [kspace_multislice, header, r_dcs] = siemens_read_kspace_cartesian_multislice(ismrmrd_noise_path, ismrmrd_data_path, siemens_dat_path, user_opts)
 % Written by Nam Gyun Lee
 % Email: namgyunl@usc.edu, ggang56@gmail.com (preferred)
 % Started: 01/16/2022, Last modified: 01/16/2022
 
 %% Read k-space data (ISMRMRD format)
 start_time = tic;
-tic; fprintf('Reading an ISMRMRD file: %s... ', ismrmrd_data_fullpath);
-if exist(ismrmrd_data_fullpath, 'file')
-    dset = ismrmrd.Dataset(ismrmrd_data_fullpath, 'dataset');
+tic; fprintf('Reading an ISMRMRD file: %s... ', ismrmrd_data_path);
+if exist(ismrmrd_data_path, 'file')
+    dset = ismrmrd.Dataset(ismrmrd_data_path, 'dataset');
     fprintf('done! (%6.4f/%6.4f sec)\n', toc, toc(start_time));
 else
-    error('File %s does not exist.  Please generate it.' , ismrmrd_data_fullpath);
+    error('File %s does not exist.  Please generate it.' , ismrmrd_data_path);
 end
 
 %% Get imaging parameters from the XML header
@@ -174,12 +174,12 @@ fprintf('readout duration   = %g [msec]\n', T * 1e3);
 fprintf('=================================================================\n');
 
 %% Calculate the receiver noise matrix
-[Psi,inv_L] = calculate_noise_decorrelation_matrix(ismrmrd_noise_fullpath);
+[Psi,inv_L] = calculate_noise_decorrelation_matrix(ismrmrd_noise_path);
 
 %% Read a Siemens .dat file
-if exist(siemens_dat_fullpath, 'file')
-    fprintf('Reading a Siemens .dat file: %s\n', siemens_dat_fullpath);
-    twix = mapVBVD(siemens_dat_fullpath);
+if exist(siemens_dat_path, 'file')
+    fprintf('Reading a Siemens .dat file: %s\n', siemens_dat_path);
+    twix = mapVBVD(siemens_dat_path);
     if length(twix) > 1
         twix = twix{end};
     end
@@ -232,7 +232,7 @@ for idx = 1:nr_recons
     R_gcs2pcs_ismrmrd = [phase_dir read_dir slice_dir];
 
     %% Get information from Siemens TWIX format
-    if exist(siemens_dat_fullpath, 'file')
+    if exist(siemens_dat_path, 'file')
         %% Get a slice normal vector from Siemens TWIX format
         %------------------------------------------------------------------
         % dNormalSag: Sagittal component of a slice normal vector (in PCS)
@@ -313,7 +313,7 @@ for idx = 1:nr_recons
     %----------------------------------------------------------------------
     % Calculate a rotation matrix from GCS to PCS
     %----------------------------------------------------------------------
-    if exist(siemens_dat_fullpath, 'file')
+    if exist(siemens_dat_path, 'file')
         [R_gcs2pcs,phase_sign,read_sign] = siemens_calculate_matrix_gcs_to_pcs(dNormalSag, dNormalCor, dNormalTra, dRotAngle);
     else
         phase_sign = user_opts.phase_sign;
