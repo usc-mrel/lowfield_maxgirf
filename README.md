@@ -94,6 +94,8 @@ Run `demo_non_cartesian_recon_human_axial.m`.
 
 Run `demo_cartesian_recon_SE_axial.m`.
 
+Run `figure5\demo_generate_figure5.m` and `figure6\demo_generate_figure6.m` to generate Figures 5 and 6, respectively.
+
 ## Figures 7 and 8 (human sagittal spiral spin-echo imaging)
 
 Update variables in `demo_non_cartesian_recon_human_sagittal.m`.
@@ -109,4 +111,4 @@ Run `demo_non_cartesian_recon_human_sagittal.m`.
 
 Run `demo_cartesian_recon_SE_sagittal.m`.
 
-Run `figures7&8\demo_generate_figure7.m` and `figures7&8\demo_generate_figure8.m` to generate Figures 7 and 8, respectively.
+Run `figure7\demo_generate_figure7.m` and `figure8\demo_generate_figure8.m` to generate Figures 7 and 8, respectively.
