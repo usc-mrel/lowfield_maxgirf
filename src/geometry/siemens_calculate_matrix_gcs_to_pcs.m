@@ -9,9 +9,9 @@ function [R_gcs2pcs,phase_sign,read_sign,main_orientation] = siemens_calculate_m
 % Started: 01/16/2022, Last modified: 01/16/2022
 
 %% Define constants
-SAGITTAL   = 0; % Patient axis perpendicular to the sagittal plane
-CORONAL    = 1; % Patient axis perpendicular to the coroal plane
-TRANSVERSE = 2; % Patient axis perpendicular to the transvers plane
+SAGITTAL    = 0; % Patient axis perpendicular to the sagittal plane
+CORONAL     = 1; % Patient axis perpendicular to the coroal plane
+TRANSVERSAL = 2; % Patient axis perpendicular to the transvers plane
 
 %% Calculate the signs of gradient waveforms due to ("swap Fre/Pha")
 main_orientation = fGSLClassOri(dNormalSag, dNormalCor, dNormalTra);
@@ -49,7 +49,7 @@ switch main_orientation
                 read_sign = -1;
                 phase_sign = -1;
             end
-    case TRANSVERSE % =2
+    case TRANSVERSAL % =2
         if dRotAngle >= 0
             if (dRotAngle <= pi/4) % 0 <= angle <= 45
                 read_sign = -1;
